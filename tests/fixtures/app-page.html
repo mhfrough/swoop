@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>App test page</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; font: 16px system-ui; }
+    .top { height: 80px; background: #1d3557; }
+    .scroll { height: calc(100% - 80px); overflow-y: auto; }
+    .band { height: 500px; }
+  </style>
+</head>
+<body>
+  <div class="top"></div>
+  <div class="scroll" id="scroll"></div>
+  <script>
+    ['#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#a0c4ff', '#bdb2ff'].forEach((c) => {
+      const b = document.createElement('div');
+      b.className = 'band';
+      b.style.background = c;
+      document.getElementById('scroll').appendChild(b);
+    });
+  </script>
+</body>
+</html>

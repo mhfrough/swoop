@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Swoop: full-page screenshots for Chrome, and a tiny screenshot app for Windows and Linux</title>
+  <meta name="description" content="Capture a whole web page as one image, or press Print Screen and drag over any part of your screen. Mark it up with arrows, boxes, text, numbered steps and blur, then copy or save. Free, and nothing is uploaded.">
+  <link rel="canonical" href="https://mhfrough.github.io/swoop/">
+  <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0d0f" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Swoop">
+  <meta property="og:title" content="Swoop: screenshots that stay on your computer">
+  <meta property="og:description" content="A full-page capture extension for Chrome and a tiny Print Screen app for Windows and Linux. One free editor. Nothing is uploaded.">
+  <meta property="og:url" content="https://mhfrough.github.io/swoop/">
+  <meta property="og:image" content="https://mhfrough.github.io/swoop/assets/icons/icon-512.png">
+  <meta name="twitter:card" content="summary">
+
+  <script>
+    try {
+      var t = localStorage.getItem('swoop-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+  <link rel="preload" href="assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="shared/editor/editor.css">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.25"/><path d="M10 2.75v1.5M10 15.75v1.5M2.75 10h1.5M15.75 10h1.5M4.87 4.87l1.06 1.06M14.07 14.07l1.06 1.06M4.87 15.13l1.06-1.06M14.07 5.93l1.06-1.06"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 20 20"><path d="M16.25 12.1A6.75 6.75 0 0 1 7.9 3.75a6.75 6.75 0 1 0 8.35 8.35Z"/></symbol>
+    <symbol id="i-auto" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.75"/><path d="M10 3.25a6.75 6.75 0 0 1 0 13.5Z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-down" viewBox="0 0 20 20"><path d="M10 3.5v9M6.25 9 10 12.75 13.75 9M4 16.25h12"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 20 20"><path d="M4 10h11.5M11 5.5l4.5 4.5-4.5 4.5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 20 20"><path d="M5 10.5l3 3 7-7"/></symbol>
+    <symbol id="i-chrome" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.75"/><circle cx="10" cy="10" r="2.75"/><path d="M10 7.25h6.4M7.6 11.4 4.4 5.9M12.4 11.4l-3.2 5.5"/></symbol>
+    <symbol id="i-windows" viewBox="0 0 20 20"><path d="M3.5 5.2 8.75 4.5v5H3.5zM10.25 4.3l6.25-.8v6h-6.25zM3.5 10.5h5.25v5L3.5 14.8zM10.25 10.5h6.25v6l-6.25-.8z"/></symbol>
+    <symbol id="i-linux" viewBox="0 0 20 20"><path d="M10 3.25c-1.9 0-3 1.5-3 3.5 0 1.3-.6 2.3-1.5 3.6-.9 1.3-1.75 2.9-1.5 4.4.3 1.6 2.4 2 6 2s5.7-.4 6-2c.25-1.5-.6-3.1-1.5-4.4-.9-1.3-1.5-2.3-1.5-3.6 0-2-1.1-3.5-3-3.5Z"/><path d="M8.6 7.2h.01M11.4 7.2h.01M9 9.25h2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 20 20"><rect x="4.25" y="8.75" width="11.5" height="8" rx="2"/><path d="M6.75 8.75V6.5a3.25 3.25 0 0 1 6.5 0v2.25"/></symbol>
+    <symbol id="i-page" viewBox="0 0 20 20"><rect x="4.75" y="2.75" width="10.5" height="14.5" rx="2"/><path d="M7.5 6.5h5M7.5 9.5h5M7.5 12.5h3"/></symbol>
+    <symbol id="i-select" viewBox="0 0 20 20"><path d="M3.5 6.5v-3h3M13.5 3.5h3v3M16.5 13.5v3h-3M6.5 16.5h-3v-3"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">Skip to the content</a>
+
+  <header class="nav" id="top">
+    <div class="nav-in">
+      <a class="brand" href="#top" aria-label="Swoop, back to the top">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" class="mark-tile"/><path class="mark-line" d="M9.5 8.5c0 8.5 4.5 13.5 13 13.5"/><path class="mark-line" d="m18.5 17.75 4.25 4.25-4.25 4.25"/></svg>
+        <span>Swoop</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#chrome">Chrome</a>
+        <a href="#desktop">Desktop</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#questions">Questions</a>
+      </nav>
+      <div class="nav-end">
+        <button type="button" class="icon-btn" id="theme" aria-label="Colour theme: automatic">
+          <svg class="ico"><use href="#i-auto"/></svg>
+        </button>
+        <a class="btn btn-ink nav-cta" href="#download">Download</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-copy">
+        <p class="eyebrow">Free · No account · Nothing uploaded</p>
+        <h1 id="hero-title">Screenshots that stay on your computer.</h1>
+        <p class="lede">Capture a whole web page as one image, or press <kbd>Print Screen</kbd> and drag over any part of your screen. Add arrows, boxes, text, numbered steps and blur, then copy or save.</p>
+        <div class="cta">
+          <a class="btn btn-primary btn-lg" href="#download-chrome">
+            <svg class="ico"><use href="#i-chrome"/></svg>Get it for Chrome
+          </a>
+          <a class="btn btn-quiet btn-lg" id="hero-desktop" href="#download-desktop">
+            <svg class="ico ico-drop"><use href="#i-down"/></svg><span>Get the desktop app</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="wrap demo-wrap">
+        <figure class="demo">
+          <div class="demo-head" aria-hidden="true">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="demo-title">Try the editor: this is the real one</span>
+          </div>
+          <div id="demo" class="demo-editor" role="region" aria-label="Swoop editor demo with a sample screenshot"></div>
+          <figcaption class="demo-cap">Draw on the sample picture. Click the editor first to use the keys: <kbd>A</kbd> arrow, <kbd>R</kbd> box, <kbd>T</kbd> text, <kbd>N</kbd> step, <kbd>B</kbd> blur, <kbd>Ctrl</kbd> <kbd>Z</kbd> undo.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="band" id="chrome" aria-labelledby="chrome-title">
+      <div class="wrap split">
+        <div class="split-copy">
+          <p class="kicker"><svg class="ico"><use href="#i-chrome"/></svg>Swoop for Chrome</p>
+          <h2 id="chrome-title">The whole page, top to bottom, in one picture.</h2>
+          <p>Click the Swoop button or press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>S</kbd>. Swoop scrolls the page, takes it one screen at a time and joins the parts into one tall image. The editor opens in a new tab.</p>
+          <ul class="checks">
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Headers show once.</strong> Sticky menus and cookie bars are not repeated down the picture.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Nothing is left blank.</strong> Swoop scrolls through first, so lazy images and fade-in effects have loaded.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Web apps work too.</strong> Pages that scroll inside a box are captured by that box.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Save as PNG, JPG or WebP,</strong> or copy straight to the clipboard.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>No scary install warning.</strong> Swoop can only see a tab after you click its button.</span></li>
+          </ul>
+        </div>
+        <ol class="steps" aria-label="How it works">
+          <li><span class="step-n">1</span><div><h3>Click Swoop</h3><p>Or press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>S</kbd>. <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>V</kbd> takes just the part you can see.</p></div></li>
+          <li><span class="step-n">2</span><div><h3>Wait a moment</h3><p>Chrome allows two captures a second, so a long page takes a few seconds.</p></div></li>
+          <li><span class="step-n">3</span><div><h3>Mark it up</h3><p>Crop, point, box, blur names and emails, then save or copy.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="band band-alt" id="desktop" aria-labelledby="desktop-title">
+      <div class="wrap split split-rev">
+        <div class="split-copy">
+          <p class="kicker"><svg class="ico"><use href="#i-select"/></svg>Swoop for Windows and Linux</p>
+          <h2 id="desktop-title">Press Print Screen. Drag. Done.</h2>
+          <p>Swoop waits in the tray. Press <kbd>Print Screen</kbd> and the screen freezes, so menus and tooltips stay put while you select. Mark up the part you chose right where it is, then press <kbd>Enter</kbd> to copy it or <kbd>Ctrl</kbd> <kbd>S</kbd> to save it.</p>
+          <ul class="checks">
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Tiny.</strong> A download of a few megabytes. It uses the web view your system already has.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Starts with your computer,</strong> with a switch in the tray menu to turn that off.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Linux is not an afterthought.</strong> Builds for Debian, Ubuntu, Fedora and an AppImage for the rest.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Saves to Pictures/Swoop</strong> with the date and time in the name. <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>S</kbd> asks where.</span></li>
+          </ul>
+        </div>
+        <div class="screen" aria-hidden="true">
+          <div class="screen-frozen">
+            <span class="win w1"></span><span class="win w2"></span><span class="win w3"></span>
+            <span class="sel">
+              <span class="sel-size num">640 × 360</span>
+              <span class="sel-arrow"></span>
+              <span class="sel-bar"><i></i><i></i><i></i><i></i><i class="go"></i></span>
+            </span>
+          </div>
+          <div class="screen-keys"><kbd>Print Screen</kbd><svg class="ico"><use href="#i-arrow"/></svg><span>drag</span><svg class="ico"><use href="#i-arrow"/></svg><kbd>Enter</kbd></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="tools" aria-labelledby="tools-title">
+      <div class="wrap">
+        <div class="head-center">
+          <p class="kicker">One editor, everywhere</p>
+          <h2 id="tools-title">Every tool is free.</h2>
+          <p class="sub">The same editor runs in the extension, the desktop app and the demo above. No paid tier, no watermark.</p>
+        </div>
+        <ul class="tools">
+          <li><kbd>A</kbd><span>Arrow</span></li>
+          <li><kbd>R</kbd><span>Box</span></li>
+          <li><kbd>O</kbd><span>Ellipse</span></li>
+          <li><kbd>L</kbd><span>Line</span></li>
+          <li><kbd>P</kbd><span>Pen</span></li>
+          <li><kbd>H</kbd><span>Highlighter</span></li>
+          <li><kbd>T</kbd><span>Text</span></li>
+          <li><kbd>N</kbd><span>Numbered steps</span></li>
+          <li><kbd>B</kbd><span>Blur</span></li>
+          <li><kbd>C</kbd><span>Crop</span></li>
+          <li><kbd>Ctrl Z</kbd><span>Undo and redo</span></li>
+          <li><kbd>Ctrl C</kbd><span>Copy</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band band-ink" id="privacy" aria-labelledby="privacy-title">
+      <div class="wrap split">
+        <div class="split-copy">
+          <p class="kicker"><svg class="ico"><use href="#i-lock"/></svg>Private by design</p>
+          <h2 id="privacy-title">Nothing is uploaded. There is nowhere to upload to.</h2>
+          <p>Some screenshot tools put your pictures on a public server and hand out short links. Old links like that could be guessed, so strangers could read other people's screenshots. Swoop has no server at all. Your pictures go to your clipboard or your disk, and nowhere else.</p>
+          <p><a class="text-link" href="privacy.html">Read the privacy policy</a></p>
+        </div>
+        <ul class="facts">
+          <li><strong>No account</strong><span>Nothing to sign up for.</span></li>
+          <li><strong>No links</strong><span>Copy and save only.</span></li>
+          <li><strong>No tracking</strong><span>No analytics in the extension, the app or this page.</span></li>
+          <li><strong>Open source</strong><span>MIT licence. Read every line on GitHub.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="band" id="questions" aria-labelledby="questions-title">
+      <div class="wrap narrow">
+        <h2 id="questions-title">Questions</h2>
+        <div class="faq">
+          <details>
+            <summary>Is Swoop really free?</summary>
+            <p>Yes. Every tool is free, there are no ads and there is no paid version. Swoop is open source under the MIT licence.</p>
+          </details>
+          <details>
+            <summary>Print Screen opens the Snipping Tool instead of Swoop.</summary>
+            <p>Windows 11 gives the Print Screen key to the Snipping Tool. Open Settings, then Accessibility, then Keyboard, and turn off <em>Use the Print screen key to open screen capture</em>. Swoop's settings window has a button that takes you there. If another screenshot app such as Lightshot or ShareX is running, it may have the key too: quit it, and Swoop takes the key the next time you open its settings.</p>
+          </details>
+          <details>
+            <summary>Print Screen does nothing on Linux.</summary>
+            <p>On Wayland, apps are not allowed to listen for keys. Add a keyboard shortcut in your system settings that runs <code>swoop --capture</code>. On X11, Print Screen works out of the box. You can always click the tray icon.</p>
+          </details>
+          <details>
+            <summary>Windows says the installer is from an unknown publisher.</summary>
+            <p>The installer is not code-signed yet, so SmartScreen may warn the first time. Choose <em>More info</em>, then <em>Run anyway</em>. You can check the source and build it yourself on GitHub.</p>
+          </details>
+          <details>
+            <summary>How long a page can the extension capture?</summary>
+            <p>Chrome limits a picture to 32,767 pixels tall. Longer pages are scaled down to fit, and the editor tells you when that happens.</p>
+          </details>
+          <details>
+            <summary>Why does a long page take a few seconds?</summary>
+            <p>Chrome allows an extension to take two pictures of a tab per second. Swoop also scrolls through the page once first, so images and animations have loaded before it captures.</p>
+          </details>
+          <details>
+            <summary>Does it work on a Mac, or in Firefox or Edge?</summary>
+            <p>Edge can install the Chrome extension as it is. A Mac app and a Firefox version are planned, but not ready yet.</p>
+          </details>
+          <details>
+            <summary>What permissions does the extension ask for?</summary>
+            <p>Only what it needs: the tab you click Swoop on (activeTab), running the capture script there, a right-click menu item, and storage for your settings and your last 12 captures. It cannot read any site you have not clicked Swoop on.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-alt" id="download" aria-labelledby="download-title">
+      <div class="wrap">
+        <div class="head-center">
+          <h2 id="download-title">Get Swoop</h2>
+          <p class="sub">Free for everyone. Version <span class="num">0.1.0</span>.</p>
+        </div>
+        <div class="downloads">
+          <article class="dl" id="download-chrome">
+            <svg class="ico dl-ico"><use href="#i-chrome"/></svg>
+            <h3>Chrome and Edge</h3>
+            <p>Full-page capture for any web page.</p>
+            <a class="btn btn-primary" id="store-link" href="https://github.com/mhfrough/swoop/releases/latest/download/swoop-chrome.zip">
+              <svg class="ico ico-drop"><use href="#i-down"/></svg><span>Download the extension</span>
+            </a>
+            <p class="dl-note" id="store-note">The Chrome Web Store listing is on its way. Until then, unzip the file, open <code>chrome://extensions</code>, turn on Developer mode and choose <em>Load unpacked</em>.</p>
+          </article>
+          <article class="dl" id="download-desktop" data-os="windows">
+            <svg class="ico dl-ico"><use href="#i-windows"/></svg>
+            <h3>Windows</h3>
+            <p>Windows 10 and 11, 64-bit.</p>
+            <a class="btn btn-primary" href="https://github.com/mhfrough/swoop/releases/latest/download/Swoop-setup.exe">
+              <svg class="ico ico-drop"><use href="#i-down"/></svg><span>Download for Windows</span>
+            </a>
+            <p class="dl-note">Installs for you only. No admin rights needed.</p>
+          </article>
+          <article class="dl" id="download-linux" data-os="linux">
+            <svg class="ico dl-ico"><use href="#i-linux"/></svg>
+            <h3>Linux</h3>
+            <p>64-bit, X11 and Wayland.</p>
+            <div class="dl-row">
+              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/swoop_amd64.deb">.deb</a>
+              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/swoop.x86_64.rpm">.rpm</a>
+              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/Swoop.AppImage">AppImage</a>
+            </div>
+            <p class="dl-note">.deb for Debian and Ubuntu, .rpm for Fedora and openSUSE, AppImage for the rest.</p>
+          </article>
+        </div>
+        <p class="all-releases"><a class="text-link" href="https://github.com/mhfrough/swoop/releases">All releases and source code on GitHub</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <p>Swoop is made by <a href="https://github.com/mhfrough">Mohammad Hamza</a>. MIT licence.</p>
+      <nav aria-label="Footer">
+        <a href="privacy.html">Privacy</a>
+        <a href="https://github.com/mhfrough/swoop">GitHub</a>
+        <a href="https://github.com/mhfrough/swoop/issues">Report a problem</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="shared/editor/editor.js"></script>
+  <script src="site.js"></script>
+</body>
+</html>

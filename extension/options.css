@@ -1,0 +1,15 @@
+body.opts { display: block; height: auto; background: var(--raised); }
+.opts-main { max-width: 560px; padding: 20px 24px 28px; }
+.opts h1 { margin: 0 0 16px; font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.opts h2 { margin: 24px 0 8px; font-size: 14px; font-weight: 600; }
+.opts p { margin: 0 0 8px; color: var(--ink-2); }
+.row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); cursor: pointer; }
+.row strong { color: var(--ink); font-weight: 550; }
+.row input { margin: 3px 0 0; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.row-select { justify-content: space-between; align-items: center; cursor: default; }
+.row select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--sunken); color: var(--ink); }
+.saved { min-height: 1.5em; font-size: 13px; }
+.keys { margin: 0 0 8px; padding: 0; list-style: none; color: var(--ink-2); }
+.keys li { padding: 3px 0; }
+kbd { font: 12px ui-monospace, Consolas, monospace; padding: 1px 6px; border-radius: 5px; background: var(--sunken); border: 1px solid var(--line); color: var(--ink); }
+.link { font: inherit; color: var(--accent-text); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Swoop settings</title>
+  <link rel="stylesheet" href="editor-page.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body class="opts">
+  <main class="opts-main">
+    <h1>Swoop settings</h1>
+    <form id="form">
+      <label class="row">
+        <input type="checkbox" name="preScroll">
+        <span><strong>Scroll the page first</strong><br>
+        Before capturing, Swoop scrolls to the bottom and back once, so animations, lazy images and long lists have loaded.</span>
+      </label>
+      <label class="row">
+        <input type="checkbox" name="hideFixed">
+        <span><strong>Show fixed headers once</strong><br>
+        Menus and bars that stay on screen appear at the top (or bottom) of the picture, not on every screen.</span>
+      </label>
+      <label class="row row-select">
+        <span><strong>Wait on each screen</strong><br>
+        More time helps pages with slow animations.</span>
+        <select name="settle">
+          <option value="100">Short (0.1 s)</option>
+          <option value="250">Normal (0.25 s)</option>
+          <option value="700">Long (0.7 s)</option>
+          <option value="1500">Very long (1.5 s)</option>
+        </select>
+      </label>
+    </form>
+    <p class="saved" id="saved" role="status" aria-live="polite"></p>
+
+    <h2>Keyboard shortcuts</h2>
+    <ul class="keys">
+      <li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> capture the whole page</li>
+      <li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> capture the visible part</li>
+    </ul>
+    <p><button type="button" class="link" id="shortcuts">Change the shortcuts</button></p>
+
+    <h2>Privacy</h2>
+    <p>Swoop has no server. Captures stay in this browser (your last 12) until you save or copy them.</p>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Swoop</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <header class="head">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" class="mark-tile"/><path class="mark-line" d="M9.5 8.5c0 8.5 4.5 13.5 13 13.5"/><path class="mark-line" d="m18.5 17.75 4.25 4.25-4.25 4.25"/></svg>
+    <div>
+      <h1>Swoop is running</h1>
+      <p class="sub">It lives in the tray, next to the clock.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Take a screenshot</h2>
+      <p id="how">Press <kbd>Print Screen</kbd>, drag over any part of the screen, mark it up, then copy or save.</p>
+      <div id="taken" class="note warn" hidden>
+        <p><strong>Windows is using Print Screen for the Snipping Tool.</strong> Turn off <em>Use the Print screen key to open screen capture</em> so Swoop gets the key.</p>
+        <button type="button" class="btn quiet" id="keyboard">Open keyboard settings</button>
+      </div>
+      <div id="nokey" class="note warn" hidden>
+        <p><strong>Another app is using the Print Screen key.</strong> It is often another screenshot app, such as Lightshot, ShareX or Greenshot. Quit it or change its key, then come back to this window and Swoop will take the key. Until then, click the tray icon to capture.</p>
+      </div>
+      <div id="wayland" class="note" hidden>
+        <p>On Wayland, apps cannot listen for keys. Bind <code>swoop --capture</code> to a key in your system's keyboard shortcuts.</p>
+      </div>
+      <button type="button" class="btn primary" id="capture">Capture now</button>
+    </section>
+
+    <section class="card">
+      <h2>Settings</h2>
+      <label class="row">
+        <span>
+          <span class="label" id="auto-label">Start with the computer</span>
+          <span class="hint">Swoop is ready whenever you need it.</span>
+        </span>
+        <input type="checkbox" role="switch" id="autostart" class="switch">
+      </label>
+      <div class="row">
+        <span>
+          <span class="label">Screenshots folder</span>
+          <span class="hint path" id="folder">…</span>
+        </span>
+        <span class="btns">
+          <button type="button" class="btn quiet" id="open">Open</button>
+          <button type="button" class="btn quiet" id="change">Change</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Keys in the editor</h2>
+      <dl class="keys">
+        <div><dt><kbd>Enter</kbd></dt><dd>Copy and close</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>C</kbd></dt><dd>Copy</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>S</kbd></dt><dd>Save to the folder</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>S</kbd></dt><dd>Save as</dd></div>
+        <div><dt><kbd>R</kbd> <kbd>O</kbd> <kbd>A</kbd> <kbd>L</kbd></dt><dd>Box, ellipse, arrow, line</dd></div>
+        <div><dt><kbd>P</kbd> <kbd>H</kbd> <kbd>T</kbd></dt><dd>Pen, highlighter, text</dd></div>
+        <div><dt><kbd>N</kbd> <kbd>B</kbd></dt><dd>Numbered step, blur</dd></div>
+        <div><dt><kbd>Ctrl</kbd> <kbd>Z</kbd></dt><dd>Undo</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Cancel</dd></div>
+      </dl>
+    </section>
+
+    <p class="foot">
+      Nothing you capture leaves this computer. <span id="version" class="num"></span>
+      <button type="button" class="link" id="site">mhfrough.github.io/swoop</button>
+    </p>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>

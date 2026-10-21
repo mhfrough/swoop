@@ -1,0 +1,16 @@
+{
+  "name": "swoop-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Swoop for Windows and Linux (Tauri 2)",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node ../tools/sync-editor.mjs",
+    "icons": "tauri icon src-tauri/icons/source.png",
+    "dev": "npm run sync && tauri dev",
+    "build": "npm run sync && tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.3"
+  }
+}

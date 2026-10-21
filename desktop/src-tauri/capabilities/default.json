@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The overlay and the settings window: events and Swoop's own commands only.",
+  "windows": ["overlay", "settings"],
+  "permissions": ["core:default"]
+}

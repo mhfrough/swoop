@@ -1,0 +1,17 @@
+{
+  "name": "swoop",
+  "private": true,
+  "author": "Mohammad Hamza (https://github.com/mhfrough)",
+  "description": "Swoop: full-page screenshots for Chrome and a tiny screenshot app for Windows and Linux",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node tools/sync-editor.mjs",
+    "icons": "node tools/make-icons.mjs",
+    "serve": "python -m http.server 8175",
+    "test": "node tools/sync-editor.mjs --check && playwright test",
+    "zip:extension": "node tools/zip-extension.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -1,0 +1,200 @@
+/* Swoop design system: tokens, fonts, base elements.
+   Every colour, size, radius and timing used in site.css comes from here.
+   The editor (shared/editor/editor.css) reads the same names when they exist.
+   Fonts are self-hosted (assets/fonts, SIL OFL 1.1). No CDN. */
+
+@font-face {
+  font-family: "Geist";
+  src: url("assets/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("assets/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- light (default) ---------- */
+:root {
+  color-scheme: light;
+
+  /* surfaces: separated by tone, not by heavy borders */
+  --bg: #f7f6f3;            /* page */
+  --bg-raised: #ffffff;     /* panels, cards, the editor */
+  --bg-sunken: #eeede9;     /* wells, inputs, segmented tracks */
+  --bg-hover: #e5e4df;
+  --line: rgba(20, 18, 16, 0.08);
+  --line-strong: rgba(20, 18, 16, 0.15);
+
+  /* ink */
+  --ink: #141210;
+  --ink-2: #4b4844;         /* secondary text */
+  --ink-3: #6b6762;         /* tertiary (4.5:1 on --bg-sunken) */
+  --ink-inverse: #ffffff;
+
+  /* one accent: swoop orange. Primary action, focus, the selection box.
+     Text on the accent is dark ink (6:1). As text on the page use --accent-text. */
+  --accent: #ff5a1f;
+  --accent-hover: #ff6d38;
+  --accent-ink: #141210;
+  --accent-text: #c2410c;
+  --accent-soft: rgba(255, 90, 31, 0.12);
+
+  /* meaning, separate from the accent */
+  --good: #076a3d;
+  --good-soft: rgba(15, 138, 82, 0.12);
+  --bad: #ad2020;
+  --bad-soft: rgba(209, 47, 47, 0.10);
+
+  /* behind screenshots */
+  --stage: #e6e5e0;
+  --scrim: rgba(12, 11, 10, 0.5);
+
+  --shadow-float: 0 1px 2px rgba(20, 18, 16, 0.06), 0 8px 24px rgba(20, 18, 16, 0.10), 0 24px 64px rgba(20, 18, 16, 0.08);
+  --shadow-panel: 0 1px 0 rgba(20, 18, 16, 0.04), 0 1px 3px rgba(20, 18, 16, 0.06);
+
+  /* type */
+  --font: "Geist", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  --text-xs: 0.75rem;      /* 12 */
+  --text-sm: 0.8125rem;    /* 13 */
+  --text-base: 0.9375rem;  /* 15 */
+  --text-md: 1.0625rem;    /* 17 reading text */
+  --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-xl: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+  --text-2xl: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+
+  --leading-tight: 1.04;
+  --leading-snug: 1.25;
+  --leading-body: 1.55;
+  --tracking-display: -0.04em;
+  --tracking-title: -0.025em;
+  --tracking-ui: -0.006em;
+
+  /* space: 4px grid */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px;
+  --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px; --s-20: 80px; --s-24: 96px; --s-32: 128px;
+  --gutter: clamp(16px, 3vw, 40px);
+  --content: 1200px;
+  --nav-h: 56px;
+
+  /* shape: nested radii */
+  --r-xs: 6px; --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px; --r-full: 999px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --t-fast: 120ms; --t-base: 200ms; --t-slow: 420ms;
+
+  --focus-ring: 2px solid var(--accent-text);
+}
+
+/* ---------- dark ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d0d0f;
+    --bg-raised: #17171a;
+    --bg-sunken: #101012;
+    --bg-hover: #232327;
+    --line: rgba(255, 255, 255, 0.07);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --ink: #f4f3f1;
+    --ink-2: #aeaba6;
+    --ink-3: #8f8c87;
+    --ink-inverse: #0d0d0f;
+    --accent: #ff6a2b;
+    --accent-hover: #ff7d45;
+    --accent-ink: #141210;
+    --accent-text: #ff7a3d;
+    --accent-soft: rgba(255, 106, 43, 0.16);
+    --good: #3ccf8e; --good-soft: rgba(60, 207, 142, 0.14);
+    --bad: #ff6b6b; --bad-soft: rgba(255, 107, 107, 0.14);
+    --stage: #0a0a0b;
+    --scrim: rgba(0, 0, 0, 0.6);
+    --shadow-float: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45), 0 32px 80px rgba(0, 0, 0, 0.35);
+    --shadow-panel: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0f;
+  --bg-raised: #17171a;
+  --bg-sunken: #101012;
+  --bg-hover: #232327;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --ink: #f4f3f1;
+  --ink-2: #aeaba6;
+  --ink-3: #8f8c87;
+  --ink-inverse: #0d0d0f;
+  --accent: #ff6a2b;
+  --accent-hover: #ff7d45;
+  --accent-ink: #141210;
+  --accent-text: #ff7a3d;
+  --accent-soft: rgba(255, 106, 43, 0.16);
+  --good: #3ccf8e; --good-soft: rgba(60, 207, 142, 0.14);
+  --bad: #ff6b6b; --bad-soft: rgba(255, 107, 107, 0.14);
+  --stage: #0a0a0b;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45), 0 32px 80px rgba(0, 0, 0, 0.35);
+  --shadow-panel: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + var(--s-4)); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: var(--text-base); line-height: var(--leading-body);
+  letter-spacing: var(--tracking-ui);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+h1, h2, h3, h4, p, figure, blockquote, ul, ol, dl, dd { margin: 0; }
+ul[class], ol[class] { padding: 0; list-style: none; }
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; }
+h1, h2, h3 { font-weight: 600; text-wrap: balance; letter-spacing: var(--tracking-title); line-height: var(--leading-snug); }
+p { text-wrap: pretty; }
+::selection { background: var(--accent-soft); color: var(--ink); }
+:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.num { font-variant-numeric: tabular-nums; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+kbd { font-family: var(--font-mono); font-size: 0.85em; padding: 0.1em 0.4em; border-radius: var(--r-xs); background: var(--bg-sunken); box-shadow: inset 0 -1px 0 var(--line-strong); white-space: nowrap; }
+
+/* ---------- shared controls ---------- */
+.btn {
+  --h: 40px;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: var(--h); padding: 0 var(--s-5); border-radius: var(--r-full);
+  font-size: var(--text-sm); font-weight: 550; white-space: nowrap; text-decoration: none;
+  transition: background-color var(--t-fast), color var(--t-fast), transform var(--t-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.97); }
+.btn .ico { transition: transform var(--t-base) var(--ease-out); }
+.btn:hover .ico-nudge { transform: translateX(3px); }
+.btn:hover .ico-drop { transform: translateY(2px); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ink { background: var(--ink); color: var(--ink-inverse); }
+.btn-ink:hover { opacity: 0.88; }
+.btn-quiet { background: var(--bg-sunken); color: var(--ink); }
+.btn-quiet:hover { background: var(--bg-hover); }
+.btn-lg { --h: 48px; padding: 0 var(--s-6); font-size: var(--text-base); }
+.ico { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}

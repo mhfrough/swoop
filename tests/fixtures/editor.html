@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editor test bench</title>
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="stylesheet" href="../../shared/editor/editor.css">
+  <style>
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    #ed { flex: 1; min-height: 0; }
+  </style>
+</head>
+<body>
+  <div id="ed"></div>
+  <script src="../../shared/editor/editor.js"></script>
+  <script>
+    // A fake web page, drawn on a canvas: ?h=height &pr=pixelRatio &layout=full|overlay
+    const q = new URLSearchParams(location.search);
+    const pr = Number(q.get('pr') || 1);
+    const W = Math.round((q.get('layout') === 'overlay' ? innerWidth : 1280) * pr);
+    const H = Math.round(Number(q.get('h') || (q.get('layout') === 'overlay' ? innerHeight : 3200)) * pr);
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    x.scale(pr, pr);
+    const w = W / pr, h = H / pr;
+    x.fillStyle = '#f4f2ee'; x.fillRect(0, 0, w, h);
+    x.fillStyle = '#1d1b19'; x.fillRect(0, 0, w, 64);
+    x.fillStyle = '#fff'; x.font = '600 20px system-ui'; x.fillText('Example Store', 32, 40);
+    for (let y = 120, i = 0; y < h - 200; y += 260, i++) {
+      x.fillStyle = ['#ffd9c7', '#cfe3ff', '#d6f5e3', '#fff1b8'][i % 4];
+      x.fillRect(32, y, w - 64, 220);
+      x.fillStyle = '#1d1b19'; x.font = '600 28px system-ui';
+      x.fillText('Section ' + (i + 1) + ': contact anna@example.com', 64, y + 70);
+      x.font = '400 16px system-ui'; x.fillStyle = '#4b4844';
+      x.fillText('Some body text that goes on for a while to look like a paragraph on a real page.', 64, y + 110);
+    }
+    x.fillStyle = '#1d1b19'; x.fillRect(0, h - 120, w, 120);
+    x.fillStyle = '#fff'; x.font = '400 14px system-ui'; x.fillText('Footer', 32, h - 60);
+
+    window.ready = SwoopEditor.create(document.getElementById('ed'), {
+      layout: q.get('layout') || 'full',
+      image: c,
+      pixelRatio: pr,
+      name: 'swoop-test',
+      notice: q.get('notice') || '',
+      onClose: q.get('layout') === 'overlay' ? () => { document.title = 'closed'; } : undefined,
+    }).then((ed) => { window.ed = ed; return ed; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* Swoop: the extension's editor tab and options page. The editor itself is styled by editor/editor.css. */
+@font-face {
+  font-family: "Geist";
+  src: url("assets/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  color-scheme: light dark;
+  --page: #f7f6f3;
+  --raised: #ffffff;
+  --ink: #141210;
+  --ink-2: #4b4844;
+  --line: rgba(20, 18, 16, 0.08);
+  --accent: #ff5a1f;
+  --accent-ink: #141210;
+  --accent-text: #c2410c;
+  --sunken: #eeede9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0d0d0f;
+    --raised: #17171a;
+    --ink: #f4f3f1;
+    --ink-2: #aeaba6;
+    --line: rgba(255, 255, 255, 0.07);
+    --accent: #ff6a2b;
+    --accent-text: #ff7a3d;
+    --sunken: #101012;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; display: flex; flex-direction: column;
+  background: var(--page); color: var(--ink);
+  font: 14px/1.5 "Geist", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  letter-spacing: -0.006em; -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-text); }
+:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+
+.top {
+  display: flex; align-items: center; gap: 16px; flex: none;
+  height: 52px; padding: 0 16px; background: var(--raised); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 650; letter-spacing: -0.02em; font-size: 15px; flex: none; }
+.mark { width: 24px; height: 24px; }
+.mark-tile { fill: var(--accent); }
+.mark-line { fill: none; stroke: var(--accent-ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.meta { min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 12px; padding-left: 16px; border-left: 1px solid var(--line); }
+.page-title { margin: 0; font-size: 14px; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.page-info { margin: 0; color: var(--ink-2); font-size: 13px; white-space: nowrap; flex: none; }
+.page-info a { text-decoration: none; }
+.page-info a:hover { text-decoration: underline; }
+.settings { color: var(--ink-2); text-decoration: none; font-size: 13px; font-weight: 550; padding: 6px 10px; border-radius: 8px; flex: none; }
+.settings:hover { background: var(--sunken); color: var(--ink); }
+
+.main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.editor { flex: 1; min-height: 0; }
+.message { margin: auto; max-width: 460px; padding: 32px 24px; text-align: center; }
+.message h2 { margin: 0 0 8px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+.message p { margin: 0; color: var(--ink-2); }
+
+@media (max-width: 640px) {
+  .page-info { display: none; }
+}

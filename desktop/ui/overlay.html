@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Swoop capture</title>
+  <link rel="stylesheet" href="editor/editor.css">
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/Geist-Variable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-display: block;
+    }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+    #editor.is-waiting { visibility: hidden; }
+  </style>
+</head>
+<body>
+  <div id="editor" class="is-waiting"></div>
+  <script src="editor/editor.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>
