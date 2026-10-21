@@ -52,7 +52,7 @@ Single purpose: capture the current web page as an image and let the user mark i
 | activeTab | To capture the tab the user clicked Swoop on, and only that tab. |
 | scripting | To scroll that tab during the capture and put it back the way it was. |
 | contextMenus | For "Capture the whole page" and "Capture the visible part" on the Swoop button's right-click menu. |
-| storage | To keep the user's settings, such as the save format. |
+| storage | To keep the user's capture settings, such as whether to scroll the page first. |
 | unlimitedStorage | To keep the user's recent captures in the browser, since a long page can be a large image. |
 
 Data use: Swoop collects no user data. Tick none of the data types, and certify that data is not sold, not used for unrelated purposes and not used for credit decisions.
