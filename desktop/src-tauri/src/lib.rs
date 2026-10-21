@@ -303,12 +303,113 @@ fn print_screen_taken_by_windows(_hotkey_ok: bool) -> bool {
     false
 }
 
-/// Takes Print Screen if it is free. Called at start-up and again whenever the settings window
-/// asks, so turning the Snipping Tool switch off works without restarting Swoop.
+/// Takes Print Screen. Called at start-up and again whenever the settings window asks.
+/// When another app has registered the key, Windows falls back to a keyboard hook that sees it first.
 fn register_hotkey(app: &AppHandle) -> bool {
+    #[cfg(windows)]
+    if print_key::installed() {
+        return true;
+    }
     let key = Shortcut::new(None, Code::PrintScreen);
     let gs = app.global_shortcut();
-    gs.is_registered(key) || gs.register(key).is_ok()
+    gs.is_registered(key) || gs.register(key).is_ok() || take_print_key(app)
+}
+
+#[cfg(windows)]
+fn take_print_key(app: &AppHandle) -> bool {
+    print_key::install(app)
+}
+#[cfg(not(windows))]
+fn take_print_key(_app: &AppHandle) -> bool {
+    false
+}
+
+/// Print Screen through a low-level keyboard hook (Windows only).
+/// RegisterHotKey fails while another app (Lightshot, ShareX, Greenshot) holds Print Screen, but a
+/// low-level hook sees the key before any registered hotkey does, so Swoop takes it there and swallows
+/// it. With Alt, Ctrl, Shift or Win held the key is left alone, so Alt+Print Screen still works.
+#[cfg(windows)]
+mod print_key {
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc, OnceLock,
+    };
+    use tauri::AppHandle;
+    use windows_sys::Win32::{
+        Foundation::{LPARAM, LRESULT, WPARAM},
+        System::LibraryLoader::GetModuleHandleW,
+        UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_CONTROL, VK_LWIN, VK_MENU, VK_RWIN, VK_SHIFT, VK_SNAPSHOT},
+        UI::WindowsAndMessaging::{
+            CallNextHookEx, GetMessageW, SetWindowsHookExW, HC_ACTION, KBDLLHOOKSTRUCT, MSG, WH_KEYBOARD_LL,
+            WM_KEYDOWN, WM_SYSKEYDOWN,
+        },
+    };
+
+    static APP: OnceLock<AppHandle> = OnceLock::new();
+    static INSTALLED: AtomicBool = AtomicBool::new(false);
+    /// Swoop took this press (swallow its key-up too)
+    static TAKEN: AtomicBool = AtomicBool::new(false);
+    /// a press with a modifier, passed on (pass its key-up on too)
+    static PASSED: AtomicBool = AtomicBool::new(false);
+
+    pub fn installed() -> bool {
+        INSTALLED.load(Ordering::SeqCst)
+    }
+
+    fn capture() {
+        if let Some(app) = APP.get() {
+            super::start_capture(app, 0);
+        }
+    }
+
+    unsafe extern "system" fn hook(code: i32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        if code == HC_ACTION as i32 {
+            let kb = &*(lparam as *const KBDLLHOOKSTRUCT);
+            if kb.vkCode == VK_SNAPSHOT as u32 {
+                let down = wparam as u32 == WM_KEYDOWN || wparam as u32 == WM_SYSKEYDOWN;
+                if down {
+                    let held = |vk: u16| (GetAsyncKeyState(vk as i32) as u16) & 0x8000 != 0;
+                    if [VK_MENU, VK_CONTROL, VK_SHIFT, VK_LWIN, VK_RWIN].into_iter().any(held) {
+                        PASSED.store(true, Ordering::SeqCst);
+                    } else {
+                        // key repeat sends more key-downs: capture on the first one only
+                        if !TAKEN.swap(true, Ordering::SeqCst) {
+                            capture();
+                        }
+                        return 1;
+                    }
+                } else if !PASSED.swap(false, Ordering::SeqCst) {
+                    // some keyboards send Print Screen as a key-up only
+                    if !TAKEN.swap(false, Ordering::SeqCst) {
+                        capture();
+                    }
+                    return 1;
+                }
+            }
+        }
+        CallNextHookEx(std::ptr::null_mut(), code, wparam, lparam)
+    }
+
+    pub fn install(app: &AppHandle) -> bool {
+        if installed() {
+            return true;
+        }
+        let _ = APP.set(app.clone());
+        let (tx, rx) = mpsc::channel();
+        // the hook runs on the thread that set it, which must keep pumping messages
+        std::thread::spawn(move || unsafe {
+            let h = SetWindowsHookExW(WH_KEYBOARD_LL, Some(hook), GetModuleHandleW(std::ptr::null()), 0);
+            let _ = tx.send(!h.is_null());
+            if h.is_null() {
+                return;
+            }
+            let mut msg: MSG = std::mem::zeroed();
+            while GetMessageW(&mut msg, std::ptr::null_mut(), 0, 0) > 0 {}
+        });
+        let ok = rx.recv().unwrap_or(false);
+        INSTALLED.store(ok, Ordering::SeqCst);
+        ok
+    }
 }
 
 #[tauri::command]

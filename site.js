@@ -20,6 +20,36 @@
   });
   applyTheme();
 
+  /* ---------- GitHub stars ----------
+     The last known count at once, then GitHub again if that count is over five minutes old or zero
+     (at most 12 requests an hour; 60 are allowed without a token). Any failure leaves no count.
+     This is the only request the page makes to another site. */
+  const star = $('#starLink');
+  const showStars = (n) => {
+    star.classList.toggle('has-count', n > 0);
+    $('#starCount').textContent = n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+    star.querySelector('.star-sr').textContent = n > 0 ? ', ' + n + ' ' + (n === 1 ? 'star' : 'stars') : '';
+  };
+  const afterLoad = (fn) => {
+    const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 300));
+    if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
+  };
+  if (star) (async () => {
+    const KEY = 'swoop-stars', FRESH = 5 * 60e3;
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(KEY)); } catch (e) { cached = null; }
+    if (cached && typeof cached.n === 'number') showStars(cached.n);
+    if (cached && cached.n > 0 && Date.now() - cached.t < FRESH) return;
+    await new Promise(afterLoad);   // never ahead of the first screen
+    try {
+      const res = await fetch('https://api.github.com/repos/mhfrough/swoop', { cache: 'no-store' });
+      const n = res.ok ? (await res.json()).stargazers_count : null;
+      if (typeof n !== 'number') return;
+      try { localStorage.setItem(KEY, JSON.stringify({ n, t: Date.now() })); } catch (e) { /* private mode */ }
+      showStars(n);
+    } catch (e) { /* offline or rate limited: no count */ }
+  })();
+
   /* ---------- point the desktop button at your system ---------- */
   const ua = navigator.userAgent;
   const os = /Windows/i.test(ua) ? 'windows' : /Linux|X11/i.test(ua) && !/Android/i.test(ua) ? 'linux' : '';

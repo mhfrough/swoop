@@ -29,6 +29,12 @@ arboard = { version = "3", default-features = false, features = ["image-data", "
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.56"
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  "Win32_System_LibraryLoader",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+] }
 
 # Small, fast release builds
 [profile.release]

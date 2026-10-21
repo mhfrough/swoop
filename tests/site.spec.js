@@ -2,6 +2,12 @@
 // every link goes somewhere, the theme switch sticks and nothing overflows at phone width.
 const { test, expect } = require('@playwright/test');
 
+// the star count comes from GitHub's API; answer it here so the tests never touch the network
+test.beforeEach(async ({ context }) => {
+  await context.route('https://api.github.com/**', (route) =>
+    route.fulfill({ contentType: 'application/json', body: JSON.stringify({ stargazers_count: 1234 }) }));
+});
+
 function watchErrors(page) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -40,6 +46,15 @@ test('the landing page loads with no errors and the editor demo draws', async ({
   await expect(page.locator('#demo button[data-tool="rect"]')).toHaveAttribute('aria-pressed', 'true');
 
   expect(errors).toEqual([]);
+});
+
+test('the GitHub star button shows the count', async ({ page }) => {
+  await page.goto('/');
+  const star = page.locator('#starLink');
+  await expect(star).toHaveAttribute('href', 'https://github.com/mhfrough/swoop');
+  await expect(star).toHaveClass(/has-count/);
+  await expect(page.locator('#starCount')).toHaveText('1.2k');
+  await expect(star).toHaveAccessibleName(/^Star on GitHub\s*, 1234 stars$/);
 });
 
 test('in-page links land on a section and local links load', async ({ page, request }) => {

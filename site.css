@@ -39,6 +39,36 @@
 .icon-btn:hover { background: var(--bg-sunken); color: var(--ink); }
 @media (max-width: 720px) { .nav-links { display: none; } }
 
+/* GitHub star: a quiet pill; once there is a count, an accent chip is revealed on its end */
+.star {
+  display: inline-flex; align-items: stretch; height: 32px; margin-inline: var(--s-1);
+  border-radius: var(--r-full); overflow: hidden; background: var(--bg-sunken); color: var(--ink);
+  font-size: var(--text-sm); font-weight: 550; text-decoration: none; white-space: nowrap;
+  transition: background-color var(--t-fast), transform var(--t-fast) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.star:hover { background: var(--bg-hover); }
+.star:active { transform: scale(0.97); }
+.star:focus-visible { border-radius: var(--r-full); }
+.star-mark { width: 16px; height: 16px; align-self: center; margin-left: var(--s-3); fill: currentColor; flex: none; }
+.star-text { display: inline-flex; align-items: center; padding: 0 var(--s-3) 0 6px; }
+.star-n {
+  display: none; align-items: center; justify-content: center; min-width: 32px; padding: 0 10px;
+  background: var(--accent); color: var(--accent-ink); font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.star.has-count .star-n { display: inline-flex; animation: star-in 360ms var(--ease-out) both; }
+@keyframes star-in { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0); } }
+@media (prefers-reduced-motion: reduce) { .star.has-count .star-n { animation: none; } }
+@media (max-width: 760px) {
+  .star-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .star-mark { margin-right: var(--s-3); }
+  .star.has-count .star-mark { margin-right: var(--s-2); }
+}
+@media (max-width: 420px) {
+  .nav-in { gap: var(--s-3); }
+  .nav-cta { display: none; }
+}
+
 /* ---------- hero ---------- */
 .hero { padding: var(--s-20) 0 var(--s-16); }
 .hero-copy { text-align: center; display: flex; flex-direction: column; align-items: center; }
