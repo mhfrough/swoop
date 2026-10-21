@@ -219,8 +219,9 @@ code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; 
 
 /* downloads */
 .downloads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); }
+/* each card shares the grid's rows (icon, title, line, action, note), so every part lines up across the cards */
 .dl {
-  display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2);
+  display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: var(--s-2); justify-items: start; align-content: start;
   padding: var(--s-6); border-radius: var(--r-xl); background: var(--bg-raised); box-shadow: var(--shadow-panel);
 }
 .dl.is-yours { box-shadow: 0 0 0 2px var(--accent), var(--shadow-panel); }
@@ -231,10 +232,10 @@ code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; 
 .dl-row { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
 .dl-row .btn { margin-top: 0; }
 .soon {
-  display: inline-flex; align-items: center; min-height: 34px; margin-top: var(--s-3); padding: 0 var(--s-4);
+  display: inline-flex; align-items: center; min-height: 40px; margin-top: var(--s-3); padding: 0 var(--s-5);
   border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-text); font-size: var(--text-sm); font-weight: 600;
 }
-.dl .dl-note { margin-top: auto; padding-top: var(--s-3); color: var(--ink-3); font-size: var(--text-sm); }
+.dl .dl-note { padding-top: var(--s-3); color: var(--ink-3); font-size: var(--text-sm); }
 .all-releases { margin-top: var(--s-8); text-align: center; }
 @media (max-width: 1100px) { .downloads { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .downloads { grid-template-columns: 1fr; } }
