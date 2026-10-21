@@ -57,6 +57,18 @@ test('the GitHub star button shows the count', async ({ page }) => {
   await expect(star).toHaveAccessibleName(/^Star on GitHub\s*, 1234 stars$/);
 });
 
+test('the bottom section links to the other projects, not to Swoop', async ({ page }) => {
+  await page.goto('/');
+  const cards = page.locator('#more .more-card');
+  await expect(cards).toHaveCount(4);
+  expect(await cards.locator('.more-name').allTextContents()).toEqual(['Flick', 'Pinch', 'Scrawl', 'Sizzle']);
+  for (const name of ['flick', 'pinch', 'scrawl', 'sizzle']) {
+    await expect(page.locator(`#more a[href="https://mhfrough.github.io/${name}/"]`)).toHaveCount(1);
+  }
+  await expect(page.locator('#more a[href*="/swoop"]')).toHaveCount(0);
+  await expect(page.locator('#more .more-ico')).toHaveCount(4);
+});
+
 test('in-page links land on a section and local links load', async ({ page, request }) => {
   await page.goto('/');
   const hrefs = await page.locator('a[href]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
@@ -68,8 +80,9 @@ test('in-page links land on a section and local links load', async ({ page, requ
   }
   // downloads go to the fixed names the release workflow attaches
   const downloads = hrefs.filter((h) => h.includes('/releases/latest/download/'));
-  expect(downloads.map((h) => h.split('/').pop()).sort()).toEqual(
-    ['Swoop-setup.exe', 'Swoop.AppImage', 'swoop-chrome.zip', 'swoop.x86_64.rpm', 'swoop_amd64.deb'].sort());
+  expect(downloads.map((h) => h.split('/').pop()).sort()).toEqual(['Swoop-setup.exe', 'swoop-chrome.zip']);
+  await expect(page.locator('#download-linux .soon')).toHaveText('Coming soon');
+  await expect(page.locator('#download-mac .soon')).toHaveText('Coming soon');
 });
 
 test('the theme switch cycles and is remembered', async ({ page }) => {
@@ -98,7 +111,7 @@ test('the desktop button points at the visitor\'s system', async ({ browser }) =
   const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36' });
   const page = await ctx.newPage();
   await page.goto('/');
-  await expect(page.locator('#hero-desktop')).toHaveText('Get it for Linux');
+  await expect(page.locator('#hero-desktop')).toHaveText('Linux: coming soon');
   await expect(page.locator('#hero-desktop')).toHaveAttribute('href', '#download-linux');
   await expect(page.locator('#download-linux')).toHaveClass(/is-yours/);
   await ctx.close();

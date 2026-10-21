@@ -218,7 +218,7 @@
 code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; border-radius: var(--r-xs); background: var(--bg-sunken); }
 
 /* downloads */
-.downloads { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+.downloads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); }
 .dl {
   display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2);
   padding: var(--s-6); border-radius: var(--r-xl); background: var(--bg-raised); box-shadow: var(--shadow-panel);
@@ -230,9 +230,35 @@ code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; 
 .dl .btn { margin-top: var(--s-3); }
 .dl-row { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
 .dl-row .btn { margin-top: 0; }
+.soon {
+  display: inline-flex; align-items: center; min-height: 34px; margin-top: var(--s-3); padding: 0 var(--s-4);
+  border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-text); font-size: var(--text-sm); font-weight: 600;
+}
 .dl .dl-note { margin-top: auto; padding-top: var(--s-3); color: var(--ink-3); font-size: var(--text-sm); }
 .all-releases { margin-top: var(--s-8); text-align: center; }
-@media (max-width: 900px) { .downloads { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .downloads { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .downloads { grid-template-columns: 1fr; } }
+
+/* more projects: the other tools, each with its own icon */
+.more { padding: var(--s-16) 0; }
+.more-title { font-size: var(--text-md); font-weight: 600; color: var(--ink-2); letter-spacing: var(--tracking-ui); margin-bottom: var(--s-5); }
+.more-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-3); }
+.more-card {
+  display: flex; align-items: center; gap: var(--s-3); height: 100%; padding: var(--s-4);
+  border-radius: var(--r-lg); background: var(--bg-raised); box-shadow: var(--shadow-panel);
+  color: var(--ink); text-decoration: none;
+  transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out);
+}
+.more-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-float); }
+.more-card:focus-visible { outline-offset: 3px; }
+.more-ico { width: 40px; height: 40px; flex: none; border-radius: 11px; overflow: hidden; }
+.more-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.more-name { font-weight: 600; font-size: var(--text-base); }
+.more-desc { color: var(--ink-3); font-size: var(--text-sm); line-height: var(--leading-snug); }
+.more-go { width: 18px; height: 18px; color: var(--ink-3); flex: none; transition: transform var(--t-base) var(--ease-out), color var(--t-fast); }
+.more-card:hover .more-go { transform: translateX(3px); color: var(--accent-text); }
+@media (max-width: 1000px) { .more-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .more-grid { grid-template-columns: 1fr; } }
 
 /* footer */
 .foot { padding: var(--s-10) 0 calc(var(--s-10) + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); color: var(--ink-3); font-size: var(--text-sm); }

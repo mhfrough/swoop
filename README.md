@@ -23,9 +23,8 @@ Screenshots that stay on your computer. A full-page capture extension for Chrome
 |---|---|---|
 | Chrome and Edge | [`swoop-chrome.zip`](https://github.com/mhfrough/swoop/releases/latest/download/swoop-chrome.zip) | Load it unpacked until the Chrome Web Store listing is live (below) |
 | Windows | [`Swoop-setup.exe`](https://github.com/mhfrough/swoop/releases/latest/download/Swoop-setup.exe) | Windows 10 and 11, 64-bit. Installs for you only, no admin rights |
-| Debian, Ubuntu | [`swoop_amd64.deb`](https://github.com/mhfrough/swoop/releases/latest/download/swoop_amd64.deb) | 64-bit |
-| Fedora, openSUSE | [`swoop.x86_64.rpm`](https://github.com/mhfrough/swoop/releases/latest/download/swoop.x86_64.rpm) | 64-bit |
-| Any Linux | [`Swoop.AppImage`](https://github.com/mhfrough/swoop/releases/latest/download/Swoop.AppImage) | 64-bit, X11 and Wayland |
+| Linux | Coming soon | `.deb` for Debian and Ubuntu, `.rpm` for Fedora, and an AppImage |
+| Mac | Coming soon | Until then, Swoop for Chrome works on a Mac |
 
 Every release also has the same files with the version in the name. See [all releases](https://github.com/mhfrough/swoop/releases).
 

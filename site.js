@@ -52,13 +52,15 @@
 
   /* ---------- point the desktop button at your system ---------- */
   const ua = navigator.userAgent;
-  const os = /Windows/i.test(ua) ? 'windows' : /Linux|X11/i.test(ua) && !/Android/i.test(ua) ? 'linux' : '';
+  const os = /Windows/i.test(ua) ? 'windows'
+    : /Macintosh|Mac OS X/i.test(ua) && !/iPhone|iPad/i.test(ua) ? 'mac'
+    : /Linux|X11/i.test(ua) && !/Android/i.test(ua) ? 'linux' : '';
   if (os) {
     const card = document.querySelector('.dl[data-os="' + os + '"]');
     card.classList.add('is-yours');
     const hero = $('#hero-desktop');
     hero.href = '#' + card.id;
-    hero.querySelector('span').textContent = os === 'windows' ? 'Get it for Windows' : 'Get it for Linux';
+    hero.querySelector('span').textContent = { windows: 'Get it for Windows', linux: 'Linux: coming soon', mac: 'Mac: coming soon' }[os];
   }
 
   /* ---------- the demo: a made-up web page, drawn on a canvas ---------- */

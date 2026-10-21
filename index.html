@@ -42,6 +42,7 @@
     <symbol id="i-chrome" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.75"/><circle cx="10" cy="10" r="2.75"/><path d="M10 7.25h6.4M7.6 11.4 4.4 5.9M12.4 11.4l-3.2 5.5"/></symbol>
     <symbol id="i-windows" viewBox="0 0 20 20"><path d="M3.5 5.2 8.75 4.5v5H3.5zM10.25 4.3l6.25-.8v6h-6.25zM3.5 10.5h5.25v5L3.5 14.8zM10.25 10.5h6.25v6l-6.25-.8z"/></symbol>
     <symbol id="i-linux" viewBox="0 0 20 20"><path d="M10 3.25c-1.9 0-3 1.5-3 3.5 0 1.3-.6 2.3-1.5 3.6-.9 1.3-1.75 2.9-1.5 4.4.3 1.6 2.4 2 6 2s5.7-.4 6-2c.25-1.5-.6-3.1-1.5-4.4-.9-1.3-1.5-2.3-1.5-3.6 0-2-1.1-3.5-3-3.5Z"/><path d="M8.6 7.2h.01M11.4 7.2h.01M9 9.25h2"/></symbol>
+    <symbol id="i-apple" viewBox="0 0 20 20"><path d="M13.6 10.6c0-1.9 1.5-2.8 1.6-2.9-.9-1.3-2.3-1.5-2.8-1.5-1.2-.1-2.3.7-2.9.7-.6 0-1.5-.7-2.5-.7-1.3 0-2.5.8-3.2 1.9-1.4 2.4-.4 5.9 1 7.8.6.9 1.4 2 2.4 1.9.9 0 1.3-.6 2.5-.6s1.5.6 2.5.6c1 0 1.7-.9 2.3-1.9.7-1.1 1-2.1 1-2.2 0 0-2-.8-1.9-3.1Z"/><path d="M11.7 4.6c.5-.6.9-1.5.8-2.4-.8 0-1.7.5-2.3 1.1-.5.6-.9 1.5-.8 2.3.9.1 1.7-.4 2.3-1Z"/></symbol>
     <symbol id="i-lock" viewBox="0 0 20 20"><rect x="4.25" y="8.75" width="11.5" height="8" rx="2"/><path d="M6.75 8.75V6.5a3.25 3.25 0 0 1 6.5 0v2.25"/></symbol>
     <symbol id="i-page" viewBox="0 0 20 20"><rect x="4.75" y="2.75" width="10.5" height="14.5" rx="2"/><path d="M7.5 6.5h5M7.5 9.5h5M7.5 12.5h3"/></symbol>
     <symbol id="i-select" viewBox="0 0 20 20"><path d="M3.5 6.5v-3h3M13.5 3.5h3v3M16.5 13.5v3h-3M6.5 16.5h-3v-3"/></symbol>
@@ -132,7 +133,7 @@
           <ul class="checks">
             <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Tiny.</strong> A download of a few megabytes. It uses the web view your system already has.</span></li>
             <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Starts with your computer,</strong> with a switch in the tray menu to turn that off.</span></li>
-            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Linux is not an afterthought.</strong> Builds for Debian, Ubuntu, Fedora and an AppImage for the rest.</span></li>
+            <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Linux and Mac are next.</strong> Packages for Debian, Ubuntu and Fedora are coming soon, then a Mac app.</span></li>
             <li><svg class="ico"><use href="#i-check"/></svg><span><strong>Saves to Pictures/Swoop</strong> with the date and time in the name. <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>S</kbd> asks where.</span></li>
           </ul>
         </div>
@@ -260,15 +261,45 @@
             <svg class="ico dl-ico"><use href="#i-linux"/></svg>
             <h3>Linux</h3>
             <p>64-bit, X11 and Wayland.</p>
-            <div class="dl-row">
-              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/swoop_amd64.deb">.deb</a>
-              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/swoop.x86_64.rpm">.rpm</a>
-              <a class="btn btn-quiet" href="https://github.com/mhfrough/swoop/releases/latest/download/Swoop.AppImage">AppImage</a>
-            </div>
-            <p class="dl-note">.deb for Debian and Ubuntu, .rpm for Fedora and openSUSE, AppImage for the rest.</p>
+            <span class="soon">Coming soon</span>
+            <p class="dl-note">Packages for Debian, Ubuntu and Fedora, and an AppImage for the rest, are on their way.</p>
+          </article>
+          <article class="dl" id="download-mac" data-os="mac">
+            <svg class="ico dl-ico"><use href="#i-apple"/></svg>
+            <h3>Mac</h3>
+            <p>Apple silicon and Intel.</p>
+            <span class="soon">Coming soon</span>
+            <p class="dl-note">A Mac app is planned. Until then, Swoop for Chrome works on a Mac.</p>
           </article>
         </div>
         <p class="all-releases"><a class="text-link" href="https://github.com/mhfrough/swoop/releases">All releases and source code on GitHub</a></p>
+      </div>
+    </section>
+    <section class="more" id="more" aria-labelledby="more-title">
+      <div class="wrap">
+        <h2 class="more-title" id="more-title">More free tools by Mohammad Hamza</h2>
+        <ul class="more-grid">
+          <li><a class="more-card" href="https://mhfrough.github.io/flick/">
+            <svg class="more-ico" aria-hidden="true" focusable="false" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#d4f84b"/><g fill="none" stroke="#11130f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 42 42 22"/><path d="M27 22h15v15"/></g><circle cx="18" cy="46" r="4" fill="#11130f"/></svg>
+            <span class="more-text"><span class="more-name">Flick</span><span class="more-desc">Send files between nearby devices</span></span>
+            <svg class="ico more-go" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a></li>
+          <li><a class="more-card" href="https://mhfrough.github.io/pinch/">
+            <svg class="more-ico" aria-hidden="true" focusable="false" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#111214"/><path d="M8 14.5V9.5A1.5 1.5 0 0 1 9.5 8h5M24 17.5v5a1.5 1.5 0 0 1-1.5 1.5h-5" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="13" y="13" width="6" height="6" rx="1.5" fill="#5c7dff"/></svg>
+            <span class="more-text"><span class="more-name">Pinch</span><span class="more-desc">Compress and convert images</span></span>
+            <svg class="ico more-go" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a></li>
+          <li><a class="more-card" href="https://mhfrough.github.io/scrawl/">
+            <svg class="more-ico" aria-hidden="true" focusable="false" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#1d1d1b"/><path d="M13 44c4-3 6-12 11-19s8-11 13-11c4 0 5 4 2 8s-8 10-5 13 9-2 13-6" fill="none" stroke="#ffe14a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="more-text"><span class="more-name">Scrawl</span><span class="more-desc">A sketchbook in your browser</span></span>
+            <svg class="ico more-go" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a></li>
+          <li><a class="more-card" href="https://mhfrough.github.io/sizzle/">
+            <svg class="more-ico" aria-hidden="true" focusable="false" viewBox="0 0 16 16"><rect width="16" height="16" fill="#111111"/><path fill="#a08672" fill-rule="evenodd" d="M3 0H13V3H12V5H13V7H12V9H13V11H12V13H13V16H3V13H4V11H3V9H4V7H3V5H4V3H3ZM6 4L11 8L6 12Z"/></svg>
+            <span class="more-text"><span class="more-name">Sizzle</span><span class="more-desc">Promo reels cut by your AI agent</span></span>
+            <svg class="ico more-go" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a></li>
+        </ul>
       </div>
     </section>
   </main>
