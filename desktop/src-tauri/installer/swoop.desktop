@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name={{name}}
+GenericName=Screenshot tool
+Comment={{comment}}
+Exec={{exec}}
+Icon={{icon}}
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=screenshot;screen capture;print screen;snip;annotate;markup;
+StartupNotify=false
+Actions=capture;
+
+[Desktop Action capture]
+Name=Capture an area
+Exec={{exec}} --capture

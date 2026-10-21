@@ -42,6 +42,8 @@ npm run build
 | Landing page | `index.html`, `site.css`, `site.js`, `tokens.css`, `privacy.html` |
 | Tests (Playwright) | `tests/`, run with `npm test` |
 | Release builds | `.github/workflows/release.yml`: push a `v*` tag |
+| Installer and store artwork | `node tools/make-brand.mjs` draws `desktop/src-tauri/installer/` and `store/` from `icon.svg` |
+| Chrome Web Store listing | `store/listing.md` |
 
 The plan and the research behind it are in [PLAN.md](PLAN.md).
 
