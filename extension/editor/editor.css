@@ -187,6 +187,21 @@
   font-family: var(--se-mono); font-size: 11px; padding: 1px 5px; border-radius: 4px;
   background: color-mix(in srgb, var(--se-bg) 18%, transparent); color: inherit; box-shadow: none;
 }
+/* right-click menu, opened at the pointer */
+.se-menu {
+  position: absolute; left: 0; top: 0; z-index: 25; min-width: 210px;
+  display: flex; flex-direction: column; padding: 5px;
+  background: var(--se-bar); border-radius: 12px; box-shadow: var(--se-shadow), 0 0 0 1px var(--se-line);
+}
+.se-menu-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  height: 32px; padding: 0 10px; border: 0; border-radius: 7px; background: none;
+  color: var(--se-ink); font: inherit; font-weight: 500; text-align: left; cursor: pointer;
+}
+.se-menu-item:hover, .se-menu-item:focus-visible { background: var(--se-hover); outline: none; }
+.se-menu-item:disabled { color: var(--se-ink-2); opacity: 0.5; cursor: default; background: none; }
+.se-menu-item kbd { font-family: var(--se-mono); font-size: 11px; color: var(--se-ink-2); background: none; box-shadow: none; padding: 0; }
+.se-menu-sep { height: 1px; margin: 4px 6px; background: var(--se-line); }
 .se-toast {
   position: absolute; left: 50%; bottom: 20px; z-index: 30; pointer-events: none;
   padding: 9px 14px; border-radius: 999px; background: var(--se-ink); color: var(--se-bg);

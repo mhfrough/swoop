@@ -50,7 +50,17 @@ a { color: var(--accent-text); }
 .mark-tile { fill: var(--accent); }
 .mark-line { fill: none; stroke: var(--accent-ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .meta { min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 12px; padding-left: 16px; border-left: 1px solid var(--line); }
-.page-title { margin: 0; font-size: 14px; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.page-title { margin: 0; font-size: 14px; font-weight: 550; display: contents; }
+/* the title is the capture's name: it reads as text and turns into a field on hover and click */
+.title-input {
+  flex: 0 1 auto; width: 20ch; min-width: 4ch; max-width: 60ch; margin: 0 0 0 -8px; padding: 4px 8px;
+  font-size: 14px; font-weight: 550;
+  border: 0; border-radius: 8px; background: transparent; color: inherit;
+  font: inherit; letter-spacing: inherit; text-overflow: ellipsis;
+}
+.title-input:not([readonly]):hover { background: var(--sunken); cursor: text; }
+.title-input:focus { background: var(--sunken); outline: 2px solid var(--accent-text); outline-offset: 0; text-overflow: clip; }
+.title-input[readonly] { pointer-events: none; }
 .page-info { margin: 0; color: var(--ink-2); font-size: 13px; white-space: nowrap; flex: none; }
 .page-info a { text-decoration: none; }
 .page-info a:hover { text-decoration: underline; }

@@ -93,7 +93,7 @@ One plain JavaScript file, no framework, no build step. The same code runs in th
 
 - **Document model:** the base picture plus a list of shapes (`rect`, `ellipse`, `arrow`, `line`, `pen`, `marker`, `text`, `step`, `pixelate`) and a crop box. Every change is a step that undo and redo can walk through.
 - **Drawing:** one canvas the size of the window, redrawn with the current zoom and pan. The picture can be any height (a 25,000 px page) without a giant canvas in the page.
-- **Saving:** at full resolution on an off-screen canvas: PNG, JPG or WebP, or copy.
+- **Saving:** at full resolution on an off-screen canvas: PNG, JPG, WebP or PDF (A4-wide pages, written without a library), or copy.
 - **Two layouts:**
   - *Full*: toolbar on top, zoom and pan. Used by the extension and the landing page demo.
   - *Overlay*: the picture fills the window at 1:1, you drag a selection and the toolbar floats next to it. Used by the desktop app.

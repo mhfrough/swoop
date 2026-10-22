@@ -45,6 +45,7 @@
       image: c,
       pixelRatio: pr,
       name: 'swoop-test',
+      tool: q.get('tool') || undefined,
       notice: q.get('notice') || '',
       onClose: q.get('layout') === 'overlay' ? () => { document.title = 'closed'; } : undefined,
     }).then((ed) => { window.ed = ed; return ed; });

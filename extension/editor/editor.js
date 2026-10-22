@@ -11,11 +11,13 @@
      name         file name without extension. Default 'swoop'.
      notice       a line of text under the toolbar (full layout)
      keys         'window' (default) or 'focus': listen to the keyboard only while the editor has focus
+     tool         the tool to start with (full layout). Default 'arrow'. The overlay always starts on 'select'.
      wheelPan     pan with the mouse wheel (full layout). Default true.
      onSave(blob, fileName, { saveAs })   default: download through <a download>
      onCopy(blob)                         default: navigator.clipboard.write
      onClose()                            overlay: Esc and the close button. Full: adds a close button.
    editor.setImage(image, { pixelRatio, name, notice }) -> Promise
+   editor.setName(name)  the file name for the next save or copy, without extension
    editor.toBlob(type = 'image/png', quality = 0.92) -> Promise<Blob>
    editor.reset()      forget shapes and selection (overlay: ready for the next capture)
    editor.destroy()
@@ -96,6 +98,39 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || '');
   let uid = 0;
+
+  const A4 = { w: 595.28, h: 841.89 };   // points
+
+  // A minimal PDF: one page per JPEG, the picture filling the page. No library needed.
+  function pdfFromJpegs(pages) {
+    const enc = new TextEncoder();
+    const parts = [], offsets = [];
+    let len = 0;
+    const push = (x) => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+    const obj = (id, dict, stream) => {
+      offsets[id] = len;
+      push(id + ' 0 obj\n' + dict);
+      if (stream) { push('\nstream\n'); push(stream); push('\nendstream'); }
+      push('\nendobj\n');
+    };
+    const f = (v) => String(Math.round(v * 100) / 100);
+    push(new Uint8Array([37, 80, 68, 70, 45, 49, 46, 52, 10, 37, 226, 227, 207, 211, 10]));   // %PDF-1.4 and a binary marker
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    obj(2, '<< /Type /Pages /Kids [' + pages.map((_, i) => (3 + i * 3) + ' 0 R').join(' ') + '] /Count ' + pages.length + ' >>');
+    pages.forEach((p, i) => {
+      const id = 3 + i * 3;
+      obj(id, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + f(p.pw) + ' ' + f(p.ph) + '] /Resources << /XObject << /Im0 ' + (id + 1) + ' 0 R >> >> /Contents ' + (id + 2) + ' 0 R >>');
+      obj(id + 1, '<< /Type /XObject /Subtype /Image /Width ' + p.w + ' /Height ' + p.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + p.jpg.length + ' >>', p.jpg);
+      const draw = enc.encode('q ' + f(p.pw) + ' 0 0 ' + f(p.ph) + ' 0 0 cm /Im0 Do Q');
+      obj(id + 2, '<< /Length ' + draw.length + ' >>', draw);
+    });
+    const size = 3 + pages.length * 3;
+    const xref = len;
+    let tail = 'xref\n0 ' + size + '\n0000000000 65535 f \n';
+    for (let i = 1; i < size; i++) tail += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+    push(tail + 'trailer\n<< /Size ' + size + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+    return new Blob(parts, { type: 'application/pdf' });
+  }
 
   function makeCanvas(w, h) {
     if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
@@ -287,7 +322,7 @@
     // view state: screen = image * s + o (CSS px inside the stage)
     const view = { s: 1, ox: 0, oy: 0, w: 0, h: 0, dpr: 1 };
     let autoFit = true;              // keep fitting on resize until the person zooms or pans
-    let tool = overlay ? 'select' : 'arrow';
+    let tool = overlay ? 'select' : TOOLS.some((t) => t.id === opt.tool) ? opt.tool : 'arrow';
     let color = COLORS[0].value;
     let size = 'm';
     let drag = null;
@@ -296,7 +331,7 @@
     let textEdit = null;             // { shape, isNew, before }
     let frame = 0;
     let format = 'png';
-    try { const f = localStorage.getItem('swoop-format'); if (f === 'png' || f === 'jpeg' || f === 'webp') format = f; } catch (e) {}
+    try { const f = localStorage.getItem('swoop-format'); if (f === 'png' || f === 'jpeg' || f === 'webp' || f === 'pdf') format = f; } catch (e) {}
 
     /* ---------- DOM ---------- */
     root.classList.add('se', overlay ? 'se-overlay' : 'se-full');
@@ -339,7 +374,7 @@
           '<button type="button" class="se-btn se-act" data-act="copy" aria-label="Copy to the clipboard" data-tip="Copy" data-key="' + mod + 'C">' + icon('copy') + '<span class="se-label">Copy</span></button>' +
           (overlay ? '' :
             '<label class="se-format"><span class="vh">Format</span><select data-act="format" aria-label="Save as">' +
-              '<option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option></select></label>') +
+              '<option value="png">PNG</option><option value="jpeg">JPG</option><option value="webp">WebP</option><option value="pdf">PDF</option></select></label>') +
           '<button type="button" class="se-btn se-act se-primary" data-act="save" aria-label="Save" data-tip="Save" data-key="' + mod + 'S">' + icon('save') + '<span class="se-label">Save</span></button>' +
           (overlay || opt.onClose ? '<button type="button" class="se-btn" data-act="close" aria-label="Close" data-tip="Close" data-key="Esc">' + icon('close') + '</button>' : '') +
         '</div>' +
@@ -355,6 +390,7 @@
           '<div class="se-sizes" role="group" aria-label="Size">' + sizes + '</div></div>' : '') +
       '</div>' +
       '<div class="se-tip" role="tooltip" hidden></div>' +
+      '<div class="se-menu" role="menu" aria-label="Screenshot actions" hidden></div>' +
       '<div class="se-toast" role="status" aria-live="polite"></div>';
 
     const $ = (s) => root.querySelector(s);
@@ -1003,17 +1039,37 @@
     }
 
     /* ---------- actions ---------- */
-    async function toBlob(type, quality) {
-      type = type || 'image/png';
+    // the picture with its marks, at full resolution
+    function renderCanvas(opaque) {
       const r = imgRect();
       if (r.w < 1 || r.h < 1) throw new Error('The selection is empty');
       const c = makeCanvas(r.w, r.h);
       const x = c.getContext('2d');
-      if (type === 'image/jpeg') { x.fillStyle = '#ffffff'; x.fillRect(0, 0, r.w, r.h); }
+      if (opaque) { x.fillStyle = '#ffffff'; x.fillRect(0, 0, r.w, r.h); }
       x.translate(-r.x, -r.y);
       drawBase(x, r.x, r.y, r.w, r.h, r.x, r.y, r.w, r.h, false);
       for (const s of shapes) drawShape(x, s);
-      return canvasToBlob(c, type, quality == null ? 0.92 : quality);
+      return c;
+    }
+    async function toBlob(type, quality) {
+      type = type || 'image/png';
+      return canvasToBlob(renderCanvas(type === 'image/jpeg'), type, quality == null ? 0.92 : quality);
+    }
+    // A PDF of A4-wide pages: a tall capture is cut into page-sized slices, each one a JPEG
+    async function toPdf() {
+      const c = renderCanvas(true);
+      const W = c.width, H = c.height;
+      const scale = A4.w / W;
+      const sliceH = Math.max(1, Math.floor(A4.h / scale));
+      const pages = [];
+      for (let y = 0; y < H; y += sliceH) {
+        const h = Math.min(sliceH, H - y);
+        const pc = makeCanvas(W, h);
+        pc.getContext('2d').drawImage(c, 0, y, W, h, 0, 0, W, h);
+        const jpg = new Uint8Array(await (await canvasToBlob(pc, 'image/jpeg', 0.92)).arrayBuffer());
+        pages.push({ jpg, w: W, h, pw: A4.w, ph: h * scale });
+      }
+      return pdfFromJpegs(pages);
     }
 
     let toastTimer = 0;
@@ -1037,13 +1093,13 @@
         toast('Could not copy: ' + (err && err.message ? err.message : 'the clipboard is not available'), true);
       }
     }
-    async function save(saveAs) {
+    async function save(saveAs, as) {
       if (textEdit) finishText(true);
       if (overlay && !crop) return;
-      const fmt = overlay ? 'png' : format;
+      const fmt = overlay ? 'png' : as || format;
       const ext = fmt === 'jpeg' ? 'jpg' : fmt;
       try {
-        const blob = await toBlob('image/' + fmt, fmt === 'png' ? undefined : 0.92);
+        const blob = fmt === 'pdf' ? await toPdf() : await toBlob('image/' + fmt, fmt === 'png' ? undefined : 0.92);
         const fileName = (opt.name || 'swoop') + '.' + ext;
         if (opt.onSave) {
           const res = await opt.onSave(blob, fileName, { saveAs: !!saveAs });
@@ -1066,6 +1122,111 @@
       if (textEdit) finishText(false);
       if (opt.onClose) opt.onClose();
     }
+    /* ---------- right-click menu ---------- */
+    const menu = $('.se-menu');
+    function menuItems() {
+      const mod = isMac ? '⌘' : 'Ctrl+';
+      return [
+        { act: 'copy', label: 'Copy', key: mod + 'C' },
+        { act: 'save', label: overlay ? 'Save' : 'Save as ' + (format === 'jpeg' ? 'JPG' : format === 'webp' ? 'WebP' : format.toUpperCase()), key: mod + 'S' },
+        overlay ? { act: 'save-as', label: 'Save as…', key: mod + 'Shift+S' } : format !== 'pdf' && { act: 'save-pdf', label: 'Save as PDF' },
+        '-',
+        { act: 'undo', label: 'Undo', key: mod + 'Z', off: !past.length },
+        { act: 'redo', label: 'Redo', key: mod + 'Shift+Z', off: !future.length },
+        selected && { act: 'delete', label: 'Delete this mark', key: 'Del' },
+        '-',
+        overlay ? { act: 'close', label: 'Cancel', key: 'Esc' } : { act: 'fit', label: 'Fit to the window', key: mod + '0' },
+      ].filter(Boolean);
+    }
+    function openMenu(x, y) {
+      hideTip();
+      if (pop && !pop.hidden) togglePop(false);
+      menu.innerHTML = '';
+      for (const it of menuItems()) {
+        if (it === '-') {
+          const hr = document.createElement('div');
+          hr.className = 'se-menu-sep';
+          hr.setAttribute('role', 'separator');
+          menu.append(hr);
+          continue;
+        }
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'se-menu-item';
+        b.setAttribute('role', 'menuitem');
+        b.dataset.act = it.act;
+        b.disabled = !!it.off;
+        b.tabIndex = -1;
+        b.append(it.label);
+        if (it.key) { const k = document.createElement('kbd'); k.textContent = it.key; b.append(k); }
+        menu.append(b);
+      }
+      menu.hidden = false;
+      const r = root.getBoundingClientRect();
+      const mw = menu.offsetWidth, mh = menu.offsetHeight;
+      const left = clamp(x - r.left, 4, r.width - mw - 4);
+      const top = y - r.top + mh + 4 > r.height ? y - r.top - mh : y - r.top;
+      menu.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(clamp(top, 4, r.height - mh - 4)) + 'px)';
+      const first = menu.querySelector('.se-menu-item:not(:disabled)');
+      if (first) first.focus({ preventScroll: true });
+    }
+    function closeMenu(refocus) {
+      if (menu.hidden) return;
+      menu.hidden = true;
+      if (refocus && opt.keys === 'focus') root.focus({ preventScroll: true });
+    }
+    function onContextMenu(e) {
+      e.preventDefault();
+      if (!base || textEdit || e.target.closest('.se-bar, .se-pop, .se-menu')) return;
+      if (overlay && !crop) return;                 // like Lightshot: right-click before selecting cancels
+      const fromKeyboard = e.button !== 2 && !e.clientX && !e.clientY;
+      const cr = canvas.getBoundingClientRect();
+      const x = fromKeyboard ? cr.left + cr.width / 2 : e.clientX;
+      const y = fromKeyboard ? cr.top + cr.height / 2 : e.clientY;
+      // right-click on a mark acts on that mark
+      const p = localPoint({ clientX: x, clientY: y });
+      const ip = toImg(p.x, p.y);
+      const hit = [...shapes].reverse().find((s) => hitShape(s, ip.x, ip.y, 4 / view.s));
+      if (hit) { selected = hit; syncUi(); render(); }
+      openMenu(x, y);
+    }
+    menu.addEventListener('click', (e) => {
+      const b = e.target.closest('.se-menu-item');
+      if (!b || b.disabled) return;
+      closeMenu(true);
+      switch (b.dataset.act) {
+        case 'copy': return copy();
+        case 'save': return save(false);
+        case 'save-as': return save(true);
+        case 'save-pdf': return save(false, 'pdf');
+        case 'undo': return undo();
+        case 'redo': return redo();
+        case 'delete': return deleteSelected();
+        case 'fit': return fit();
+        case 'close': return close();
+      }
+    });
+    menu.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      const items = Array.from(menu.querySelectorAll('.se-menu-item:not(:disabled)'));
+      const i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const n = items.length;
+        items[(i + (e.key === 'ArrowDown' ? 1 : n - 1) + n) % n].focus();
+      } else if (e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        items[e.key === 'Home' ? 0 : items.length - 1].focus();
+      } else if (e.key === 'Escape' || e.key === 'Tab') {
+        e.preventDefault();
+        closeMenu(true);
+      }
+    });
+    const onOutside = (e) => { if (!menu.contains(e.target)) closeMenu(false); };
+    const onBlur = () => closeMenu(false);
+    document.addEventListener('pointerdown', onOutside, true);
+    window.addEventListener('blur', onBlur);
+
     function deleteSelected() {
       if (!selected) return;
       const before = snapshot();
@@ -1191,7 +1352,7 @@
     canvas.addEventListener('pointerup', onUp);
     canvas.addEventListener('pointercancel', onUp);
     canvas.addEventListener('pointerleave', () => { if (!drag) { hover = null; if (overlay) render(); } });
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    stage.addEventListener('contextmenu', onContextMenu);
     canvas.addEventListener('wheel', onWheel, { passive: false });
     const ro = new ResizeObserver(resize);
     ro.observe(stage);
@@ -1238,9 +1399,12 @@
       get shapes() { return shapes.map(cloneShape); },
       get crop() { return crop && Object.assign({}, crop); },
       setTool, setColor, setSize,
+      setName(name) { opt.name = name || 'swoop'; },
       destroy() {
         ro.disconnect();
         mq.removeEventListener('change', onScheme);
+        document.removeEventListener('pointerdown', onOutside, true);
+        window.removeEventListener('blur', onBlur);
         keyTarget.removeEventListener('keydown', onKey);
         keyTarget.removeEventListener('keyup', onKeyUp);
         cancelAnimationFrame(frame);

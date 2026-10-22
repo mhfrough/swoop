@@ -43,7 +43,9 @@ It is built for real pages, not just simple ones:
 - **Web apps work too.** When the page scrolls inside a box instead of the window, Swoop finds the largest scrolling box and captures that.
 - **No scrollbars or smooth-scroll jumps** in the picture. The page is put back exactly as it was afterwards.
 - **Very tall pages** are scaled down to fit Chrome's limit of 32,767 pixels, and the editor says so.
-- **Save as PNG, JPG or WebP,** or copy to the clipboard. Your last 12 captures are kept in the browser.
+- **Save as PNG, JPG, WebP or PDF,** or copy to the clipboard. A long page becomes several A4 pages in the PDF. Your last 12 captures are kept in the browser.
+- **Right-click the picture** for Copy, Save, Save as PDF, Undo and Delete, right where the pointer is.
+- **Click the title to rename the capture.** The name is also the file name.
 
 Settings (right-click the Swoop button, then **Options**): scroll the page first, show fixed headers once, and how long to wait on each screen for slow animations.
 

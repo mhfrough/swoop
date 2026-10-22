@@ -44,5 +44,12 @@
     return shot;
   }
 
-  global.SwoopStore = { put, get };
+  async function update(id, patch) {
+    const db = await open();
+    const shot = await tx(db, 'readonly', (s) => s.get(id));
+    if (shot) await tx(db, 'readwrite', (s) => s.put(Object.assign(shot, patch)));
+    db.close();
+  }
+
+  global.SwoopStore = { put, get, update };
 })(typeof self !== 'undefined' ? self : window);

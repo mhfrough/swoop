@@ -101,7 +101,7 @@ test('captures a long page with a sticky header, a fixed bar, scroll animations 
   expect(after).toEqual({ y: 0, header: 'sticky', cookie: 'visible', style: false });
 
   // the editor shows the picture
-  await expect(editor.locator('#title')).toHaveText('Long test page');
+  await expect(editor.locator('#title')).toHaveValue('Long test page');
   await expect(editor.locator('.se-canvas')).toBeVisible();
   await editor.waitForTimeout(300);
   await editor.screenshot({ path: 'test-results/extension-editor.png' });
@@ -119,6 +119,36 @@ test('captures an app that scrolls inside a box', async () => {
   expect(r.height).toBe(80 + 6 * 500);
   expect(near(r.px.top, '#1d3557')).toBe(true);
   bands.forEach((c, i) => expect(near(r.px['band' + i], c), 'band ' + i).toBe(true));
+  await page.close();
+  await editor.close();
+});
+
+test('the editor tab starts on Select and move, and the title renames the file', async () => {
+  const page = await context.newPage();
+  const editor = await capture(page, '/tests/fixtures/app-page.html', { preScroll: false, settle: 100 });
+  await expect(editor.locator('button[data-tool="select"]')).toHaveAttribute('aria-pressed', 'true');
+
+  const title = editor.locator('#title');
+  await expect(title).toHaveAttribute('title', /^Click to rename\. Saves as swoop-localhost-/);
+  await title.click();
+  await editor.keyboard.type('Checkout bug: step 2?');
+  await editor.keyboard.press('Enter');
+  await expect(title).toHaveValue('Checkout bug: step 2?');
+  await expect(editor).toHaveTitle('Swoop: Checkout bug: step 2?');
+
+  // characters a file name can't hold become spaces
+  const [download] = await Promise.all([editor.waitForEvent('download'), editor.keyboard.press('Control+s')]);
+  expect(download.suggestedFilename()).toMatch(/^Checkout bug step 2\.(png|jpg|webp|pdf)$/);
+
+  // Esc puts the name back
+  await title.click();
+  await editor.keyboard.type('Something else');
+  await editor.keyboard.press('Escape');
+  await expect(title).toHaveValue('Checkout bug: step 2?');
+
+  // the new name is kept with the capture
+  await editor.reload();
+  await expect(editor.locator('#title')).toHaveValue('Checkout bug: step 2?');
   await page.close();
   await editor.close();
 });

@@ -34,7 +34,8 @@ Mark it up, free:
 • Text and numbered steps (1, 2, 3) for how-to guides
 • Blur, to hide names and emails
 • Crop, undo and redo
-• Save as PNG, JPG or WebP, or copy to the clipboard
+• Save as PNG, JPG, WebP or PDF, or copy to the clipboard
+• Right-click for Copy, Save and Undo, and click the title to rename the file
 
 Private by design:
 • Nothing is uploaded. There is no Swoop server, no account and no links.
