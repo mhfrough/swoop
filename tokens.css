@@ -10,13 +10,33 @@
   font-style: normal;
   font-display: swap;
 }
-/* Arial, resized to Geist's width and height, so text keeps its line breaks when Geist arrives */
+/* Local fonts resized to Geist's width and height, so text keeps its line breaks when the web fonts
+   arrive. Regular and bold are separate faces: a faked bold would be wider and wrap differently. */
 @font-face {
   font-family: "Geist Fallback";
-  src: local("Arial"), local("Helvetica"), local("Liberation Sans");
-  size-adjust: 101.5%;
-  ascent-override: 99.5%;
-  descent-override: 29.6%;
+  src: local("Arial"), local("ArialMT"), local("Helvetica"), local("Liberation Sans");
+  font-weight: 100 549;
+  size-adjust: 102%;
+  ascent-override: 99%;
+  descent-override: 29.4%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Geist Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Liberation Sans Bold");
+  font-weight: 550 900;
+  size-adjust: 101%;
+  ascent-override: 100%;
+  descent-override: 29.7%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Geist Mono Fallback";
+  src: local("Courier New"), local("CourierNewPSMT"), local("Liberation Mono");
+  font-weight: 100 900;
+  size-adjust: 100%;
+  ascent-override: 101%;
+  descent-override: 30%;
   line-gap-override: 0%;
 }
 @font-face {
@@ -69,7 +89,7 @@
 
   /* type */
   --font: "Geist", "Geist Fallback", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, "SF Mono", Consolas, monospace;
 
   --text-xs: 0.75rem;      /* 12 */
   --text-sm: 0.8125rem;    /* 13 */

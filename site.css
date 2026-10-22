@@ -71,6 +71,8 @@
 }
 
 /* ---------- hero ---------- */
+/* text widths are in em, not ch: a ch is the width of "0" in whichever font is showing, so ch widths
+   jump when Geist replaces the fallback font and the text re-wraps (layout shift) */
 .hero { padding: var(--s-20) 0 var(--s-16); }
 .hero-copy { text-align: center; display: flex; flex-direction: column; align-items: center; }
 .eyebrow {
@@ -78,9 +80,9 @@
   background: var(--accent-soft); color: var(--accent-text); font-size: var(--text-sm); font-weight: 550;
 }
 .hero h1 {
-  max-width: 15ch; font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); font-weight: 650;
+  max-width: 10.3em; font-size: var(--text-2xl); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); font-weight: 650;
 }
-.lede { max-width: 60ch; margin-top: var(--s-5); color: var(--ink-2); font-size: var(--text-lg); line-height: var(--leading-snug); }
+.lede { max-width: 39.8em; margin-top: var(--s-5); color: var(--ink-2); font-size: var(--text-lg); line-height: var(--leading-snug); }
 .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-3); margin-top: var(--s-8); }
 
 .demo-wrap { margin-top: var(--s-12); }
@@ -105,7 +107,7 @@
 .band { padding: var(--s-24) 0; }
 .band-alt { background: var(--bg-sunken); }
 .band-ink { background: var(--ink); color: var(--ink-inverse); }
-.band h2 { font-size: var(--text-xl); line-height: 1.1; letter-spacing: var(--tracking-display); max-width: 18ch; }
+.band h2 { font-size: var(--text-xl); line-height: 1.1; letter-spacing: var(--tracking-display); max-width: 12.3em; }
 .band-ink .kicker, .band-ink .text-link { color: var(--accent-on-inverse); }
 .band-ink p { color: color-mix(in srgb, var(--ink-inverse) 78%, transparent); }
 .band-ink ::selection { color: var(--ink-inverse); }
@@ -117,13 +119,13 @@
 }
 .kicker .ico { width: 18px; height: 18px; }
 .head-center { text-align: center; display: flex; flex-direction: column; align-items: center; margin-bottom: var(--s-12); }
-.head-center h2 { max-width: 22ch; }
-.sub { margin-top: var(--s-3); max-width: 56ch; color: var(--ink-2); font-size: var(--text-md); }
+.head-center h2 { max-width: 15em; }
+.sub { margin-top: var(--s-3); max-width: 37em; color: var(--ink-2); font-size: var(--text-md); }
 .text-link { color: var(--accent-text); font-weight: 550; text-underline-offset: 3px; }
 
 .split { display: grid; grid-template-columns: 1.05fr 1fr; gap: var(--s-16); align-items: center; }
 .split-rev > :first-child { order: 2; }
-.split-copy > p { margin-top: var(--s-4); max-width: 56ch; color: var(--ink-2); font-size: var(--text-md); }
+.split-copy > p { margin-top: var(--s-4); max-width: 37em; color: var(--ink-2); font-size: var(--text-md); }
 .band-ink .split-copy > p { color: color-mix(in srgb, var(--ink-inverse) 78%, transparent); }
 @media (max-width: 900px) {
   .split { grid-template-columns: 1fr; gap: var(--s-10); }
@@ -214,7 +216,7 @@
   transform: rotate(45deg); transition: transform var(--t-base) var(--ease-out);
 }
 .faq details[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
-.faq details p { padding: 0 var(--s-5) var(--s-5); color: var(--ink-2); max-width: 64ch; }
+.faq details p { padding: 0 var(--s-5) var(--s-5); color: var(--ink-2); max-width: 42.4em; }
 code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; border-radius: var(--r-xs); background: var(--bg-sunken); }
 
 /* downloads */
@@ -273,7 +275,7 @@ code { font-family: var(--font-mono); font-size: 0.88em; padding: 0.1em 0.35em; 
 .doc h1 { font-size: var(--text-xl); letter-spacing: var(--tracking-display); line-height: 1.1; }
 .doc .updated { margin-top: var(--s-3); color: var(--ink-3); }
 .doc h2 { margin-top: var(--s-10); font-size: var(--text-lg); }
-.doc p, .doc li { margin-top: var(--s-3); color: var(--ink-2); font-size: var(--text-md); max-width: 68ch; }
+.doc p, .doc li { margin-top: var(--s-3); color: var(--ink-2); font-size: var(--text-md); max-width: 45em; }
 .doc ul { padding-left: var(--s-5); }
 .doc .summary { margin-top: var(--s-8); padding: var(--s-5) var(--s-6); border-radius: var(--r-lg); background: var(--accent-soft); color: var(--ink); font-size: var(--text-md); }
 .doc a { color: var(--accent-text); text-underline-offset: 3px; }
