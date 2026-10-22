@@ -149,3 +149,24 @@ test('every image and form control on the landing page has a name', async ({ pag
   const ids = await page.evaluate(() => [...document.querySelectorAll('[id]')].map((e) => e.id));
   expect(new Set(ids).size).toBe(ids.length);
 });
+
+test('link previews use a 1200 x 630 image that exists', async ({ page, request }) => {
+  await page.goto('/');
+  const meta = (sel) => page.locator(sel).getAttribute('content');
+  expect(await meta('meta[name="twitter:card"]')).toBe('summary_large_image');
+  const og = await meta('meta[property="og:image"]');
+  expect(og).toBe('https://mhfrough.github.io/swoop/assets/og-image.jpg');
+  expect(await meta('meta[property="og:image:width"]')).toBe('1200');
+  expect(await meta('meta[property="og:image:height"]')).toBe('630');
+  expect(await meta('meta[property="og:image:alt"]')).toBeTruthy();
+  const res = await request.get('/assets/og-image.jpg');
+  expect(res.status()).toBe(200);
+  const size = await page.evaluate(async () => {
+    const img = new Image();
+    img.src = '/assets/og-image.jpg';
+    await img.decode();
+    return [img.naturalWidth, img.naturalHeight];
+  });
+  expect(size).toEqual([1200, 630]);
+  expect((await res.body()).length).toBeLessThan(300 * 1024);
+});

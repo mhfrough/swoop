@@ -1,6 +1,6 @@
 [package]
 name = "swoop"
-version = "0.1.2"
+version = "0.1.3"
 description = "Swoop: press Print Screen, select an area, mark it up and save."
 authors = ["Mohammad Hamza"]
 license = "MIT"

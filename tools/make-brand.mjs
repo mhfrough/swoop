@@ -5,6 +5,8 @@
 //   desktop/src-tauri/installer/header.bmp   the other pages (150 x 57)
 // Chrome Web Store:
 //   store/promo-small.png (440 x 280), store/marquee.png (1400 x 560), store/screenshot-1.png (1280 x 800)
+// Link previews (og:image):
+//   assets/og-image.jpg (1200 x 630)
 import { chromium } from '@playwright/test';
 import { createServer } from 'node:http';
 import { readFileSync, mkdirSync, writeFileSync, existsSync, statSync } from 'node:fs';
@@ -196,6 +198,36 @@ for (const a of Object.values(art)) {
   mkdirSync(join(root, 'store'), { recursive: true });
   await page.screenshot({ path: join(root, 'store/screenshot-1.png') });
   console.log('store/screenshot-1.png (1280 x 800)');
+}
+
+// link preview for the landing page (og:image): the name and promise, next to the real editor
+{
+  const shot = readFileSync(join(root, 'store/screenshot-1.png')).toString('base64');
+  const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+  await page.setContent(`<!doctype html><style>${base}
+    body { background: linear-gradient(155deg, #ff6d33 0%, #ff5a1f 50%, #ec4a10 100%); position: relative; }
+    .copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 470px; display: flex; flex-direction: column; justify-content: center; }
+    .row { display: flex; align-items: center; gap: 18px; }
+    .t { width: 76px; height: 76px; border-radius: 20px; background: #141210; display: grid; place-items: center; }
+    h1 { font-size: 80px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; }
+    p { margin-top: 30px; font-size: 40px; font-weight: 650; line-height: 1.12; letter-spacing: -0.035em; }
+    .small { margin-top: 26px; font-size: 22px; font-weight: 550; letter-spacing: -0.01em; color: rgba(20,18,16,.75); }
+    .frame { position: absolute; left: 590px; top: 84px; width: 880px; border-radius: 16px; overflow: hidden; background: #fff;
+             box-shadow: 0 30px 80px rgba(70,20,0,.35), 0 0 0 1px rgba(20,18,16,.08); }
+    .bar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 16px; background: #eeede9; border-bottom: 1px solid rgba(20,18,16,.08); }
+    .bar i { width: 11px; height: 11px; border-radius: 50%; background: rgba(20,18,16,.18); }
+    .frame img { display: block; width: 100%; }
+  </style>
+  <div class="copy">
+    <div class="row"><div class="t">${arrow(56, '#ff5a1f', 2.8)}</div><h1>Swoop</h1></div>
+    <p>Screenshots that stay on your computer.</p>
+    <p class="small">Full-page capture for Chrome · Print Screen app for Windows · Free</p>
+  </div>
+  <div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="data:image/png;base64,${shot}" alt=""></div>`);
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: join(root, 'assets/og-image.jpg'), type: 'jpeg', quality: 88 });
+  console.log('assets/og-image.jpg (1200 x 630)');
+  await page.close();
 }
 
 await browser.close();

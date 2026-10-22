@@ -114,3 +114,25 @@ test('in the overlay, right-click cancels before a selection and opens the menu 
   await menu.getByRole('menuitem', { name: /Cancel/ }).click();
   await expect(page).toHaveTitle('closed');
 });
+
+test('swatches keep their colours under a strict CSP like the desktop app', async ({ page }) => {
+  // a nonce turns off 'unsafe-inline', so style="" attributes in markup are blocked, as in Tauri
+  await page.route('**/tests/fixtures/editor.html*', async (route) => {
+    const res = await route.fetch();
+    await route.fulfill({ response: res, headers: { ...res.headers(), 'content-security-policy': "style-src 'self' 'unsafe-inline' 'nonce-swoop'" } });
+  });
+  await page.setViewportSize({ width: 1000, height: 700 });
+  await page.goto('/tests/fixtures/editor.html?layout=overlay');
+  await page.waitForFunction(() => window.ed);
+  await page.mouse.move(200, 200);
+  await page.mouse.down();
+  await page.mouse.move(600, 450, { steps: 5 });
+  await page.mouse.up();
+  await page.locator('.se-style-btn').click();
+  const colours = await page.locator('.se-pop .se-swatch').evaluateAll((els) =>
+    els.map((el) => getComputedStyle(el, '::before').backgroundColor));
+  expect(colours).toEqual([
+    'rgb(255, 59, 48)', 'rgb(255, 149, 0)', 'rgb(255, 214, 10)', 'rgb(48, 209, 88)',
+    'rgb(10, 132, 255)', 'rgb(255, 45, 146)', 'rgb(22, 22, 26)', 'rgb(255, 255, 255)',
+  ]);
+});

@@ -80,7 +80,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   background: var(--se-bar);
   border-bottom: 1px solid var(--se-line);
   flex: none;

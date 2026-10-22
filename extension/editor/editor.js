@@ -343,7 +343,7 @@
       '" data-tip="' + t.name + '" data-key="' + t.key.toUpperCase() + '">' + icon(t.id) + '</button>').join('');
     const swatches = COLORS.map((c) =>
       '<button type="button" class="se-swatch" data-color="' + c.value + '" aria-pressed="false" aria-label="' + c.name +
-      '" data-tip="' + c.name + '" style="--c:' + c.value + '"></button>').join('');
+      '" data-tip="' + c.name + '"></button>').join('');
     const sizes = SIZES.map((z) =>
       '<button type="button" class="se-size-btn" data-size="' + z.value + '" aria-pressed="false" aria-label="' + z.name +
       '" data-tip="' + z.name + '"><span class="se-dot se-dot-' + z.value + '"></span></button>').join('');
@@ -409,6 +409,8 @@
     const zoomVal = $('.se-zoom-val');
     const formatSel = $('select[data-act="format"]');
     if (formatSel) formatSel.value = format;
+    // swatch colours are set here, not in style="" attributes, which a strict CSP (the desktop app) blocks
+    $$('.se-swatch').forEach((b) => b.style.setProperty('--c', b.dataset.color));
 
     /* ---------- state helpers ---------- */
     const snapshot = () => ({ shapes: shapes.map(cloneShape), crop: crop && Object.assign({}, crop) });
