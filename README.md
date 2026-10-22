@@ -61,7 +61,9 @@ Swoop starts with your computer and sits in the tray.
 
 Screenshots are saved full size to `Pictures/Swoop`, named with the date and time, for example `Swoop 2026-10-22 at 14.03.22.png`. The tray menu has the screenshots folder, the start-with-computer switch and the settings window.
 
-**Print Screen and other apps.** If another screenshot app (Lightshot, ShareX, Greenshot) has the Print Screen key, Swoop on Windows takes it anyway, using a keyboard hook that sees the key first. Combinations with <kbd>Alt</kbd>, <kbd>Ctrl</kbd>, <kbd>Shift</kbd> or <kbd>Win</kbd> are left alone, so <kbd>Alt</kbd>+<kbd>Print Screen</kbd> still works as usual. On Windows 11, if Print Screen still opens the Snipping Tool, turn off **Settings → Accessibility → Keyboard → Use the Print screen key to open screen capture**. Swoop's settings window has a button for it.
+**Print Screen is your choice.** The settings window and the tray menu have a **Print Screen opens Swoop** switch, on by default. On, Swoop takes the key, even when the Snipping Tool or another screenshot app (Lightshot, ShareX, Greenshot) has it: it turns off Windows' *Use the Print screen key to open screen capture* setting and, if another app holds the key, uses a keyboard hook that sees it first. Off, Swoop lets go of the key and puts Windows' setting back as it was. Combinations with <kbd>Alt</kbd>, <kbd>Ctrl</kbd>, <kbd>Shift</kbd> or <kbd>Win</kbd> are always left alone.
+
+**Updating** is just running the new `Swoop-setup.exe`: it closes Swoop, installs over the old version and keeps your settings.
 
 **Wayland.** Apps cannot listen for keys on Wayland. Add a keyboard shortcut in your system settings that runs `swoop --capture`. The app menu entry also has a **Capture an area** action. On X11, Print Screen works out of the box.
 

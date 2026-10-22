@@ -18,13 +18,21 @@
   <main>
     <section class="card">
       <h2>Take a screenshot</h2>
+      <label class="row row-top">
+        <span>
+          <span class="label">Print Screen opens Swoop</span>
+          <span class="hint" id="print-hint">Swoop is your screenshot key, instead of the Snipping Tool or another app.</span>
+        </span>
+        <input type="checkbox" role="switch" id="printscreen" class="switch">
+      </label>
       <p id="how">Press <kbd>Print Screen</kbd>, drag over any part of the screen, mark it up, then copy or save.</p>
+      <p id="how-off" hidden>Print Screen is left for Windows or your other screenshot app. To use Swoop, click its icon in the tray or press Capture now.</p>
       <div id="taken" class="note warn" hidden>
         <p><strong>Windows is using Print Screen for the Snipping Tool.</strong> Turn off <em>Use the Print screen key to open screen capture</em> so Swoop gets the key.</p>
         <button type="button" class="btn quiet" id="keyboard">Open keyboard settings</button>
       </div>
       <div id="nokey" class="note warn" hidden>
-        <p><strong>Another app is using the Print Screen key.</strong> It is often another screenshot app, such as Lightshot, ShareX or Greenshot. Quit it or change its key, then come back to this window and Swoop will take the key. Until then, click the tray icon to capture.</p>
+        <p><strong>Swoop could not take the Print Screen key.</strong> It is often another screenshot app, such as Lightshot, ShareX or Greenshot. Quit it or change its key, then come back to this window and Swoop will take the key. Until then, click the tray icon to capture.</p>
       </div>
       <div id="wayland" class="note" hidden>
         <p>On Wayland, apps cannot listen for keys. Bind <code>swoop --capture</code> to a key in your system's keyboard shortcuts.</p>

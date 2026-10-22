@@ -45,12 +45,30 @@ struct AppState {
     /// kept alive so Linux clipboards keep serving the image after the overlay closes
     clipboard: Mutex<Option<arboard::Clipboard>>,
     autostart_item: Mutex<Option<CheckMenuItem<Wry>>>,
+    print_item: Mutex<Option<CheckMenuItem<Wry>>>,
 }
 
-#[derive(Serialize, Deserialize, Default, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct Settings {
     save_dir: Option<String>,
     welcomed: bool,
+    /// Print Screen opens Swoop (the default). Off gives the key back to Windows or another app.
+    #[serde(default = "yes")]
+    print_screen: bool,
+    /// Windows' Snipping Tool switch before Swoop turned it off: None = Swoop never changed it,
+    /// Some(-1) = the value was missing, Some(n) = its old value
+    #[serde(default)]
+    snip_before: Option<i64>,
+}
+
+fn yes() -> bool {
+    true
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Settings { save_dir: None, welcomed: false, print_screen: true, snip_before: None }
+    }
 }
 
 /* ------------------------------------------------------------ settings file */
@@ -271,6 +289,7 @@ struct SettingsView {
     version: String,
     platform: &'static str,
     hotkey_ok: bool,
+    print_screen: bool,
     wayland: bool,
     print_screen_taken: bool,
     autostart: bool,
@@ -303,15 +322,25 @@ fn print_screen_taken_by_windows(_hotkey_ok: bool) -> bool {
     false
 }
 
-/// Takes Print Screen. Called at start-up and again whenever the settings window asks.
+/// Takes Print Screen when the setting is on and gives it back when it is off. Called at start-up,
+/// when the setting changes, and whenever the settings window asks (so a key another app frees is taken).
 /// When another app has registered the key, Windows falls back to a keyboard hook that sees it first.
 fn register_hotkey(app: &AppHandle) -> bool {
+    let key = Shortcut::new(None, Code::PrintScreen);
+    let gs = app.global_shortcut();
+    if !load_settings(app).print_screen {
+        if gs.is_registered(key) {
+            let _ = gs.unregister(key);
+        }
+        release_print_key();
+        snipping_tool(app, false);
+        return false;
+    }
+    snipping_tool(app, true);
     #[cfg(windows)]
     if print_key::installed() {
         return true;
     }
-    let key = Shortcut::new(None, Code::PrintScreen);
-    let gs = app.global_shortcut();
     gs.is_registered(key) || gs.register(key).is_ok() || take_print_key(app)
 }
 
@@ -324,6 +353,52 @@ fn take_print_key(_app: &AppHandle) -> bool {
     false
 }
 
+#[cfg(windows)]
+fn release_print_key() {
+    print_key::uninstall();
+}
+#[cfg(not(windows))]
+fn release_print_key() {}
+
+/// Windows 11 opens the Snipping Tool on Print Screen. While Swoop has the key that switch is off;
+/// turning Swoop's switch off puts Windows' switch back the way it was.
+#[cfg(windows)]
+fn snipping_tool(app: &AppHandle, swoop_has_key: bool) {
+    use winreg::{enums::*, RegKey};
+    const NAME: &str = "PrintScreenKeyForSnippingEnabled";
+    let Ok((key, _)) = RegKey::predef(HKEY_CURRENT_USER).create_subkey("Control Panel\\Keyboard") else {
+        return;
+    };
+    let mut s = load_settings(app);
+    if swoop_has_key {
+        let now = key.get_value::<u32, _>(NAME).ok();
+        if now == Some(0) {
+            return;
+        }
+        if s.snip_before.is_none() {
+            s.snip_before = Some(now.map(i64::from).unwrap_or(-1));
+            store_settings(app, &s);
+        }
+        let _ = key.set_value(NAME, &0u32);
+    } else if let Some(before) = s.snip_before.take() {
+        let _ = if before < 0 { key.delete_value(NAME) } else { key.set_value(NAME, &(before as u32)) };
+        store_settings(app, &s);
+    }
+}
+#[cfg(not(windows))]
+fn snipping_tool(_app: &AppHandle, _swoop_has_key: bool) {}
+
+/// Turns "Print Screen opens Swoop" on or off, from the settings window or the tray.
+fn apply_print_screen(app: &AppHandle, on: bool) {
+    let mut s = load_settings(app);
+    s.print_screen = on;
+    store_settings(app, &s);
+    register_hotkey(app);
+    if let Some(item) = app.state::<AppState>().print_item.lock().unwrap().as_ref() {
+        let _ = item.set_checked(on);
+    }
+}
+
 /// Print Screen through a low-level keyboard hook (Windows only).
 /// RegisterHotKey fails while another app (Lightshot, ShareX, Greenshot) holds Print Screen, but a
 /// low-level hook sees the key before any registered hotkey does, so Swoop takes it there and swallows
@@ -331,22 +406,24 @@ fn take_print_key(_app: &AppHandle) -> bool {
 #[cfg(windows)]
 mod print_key {
     use std::sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU32, Ordering},
         mpsc, OnceLock,
     };
     use tauri::AppHandle;
     use windows_sys::Win32::{
         Foundation::{LPARAM, LRESULT, WPARAM},
-        System::LibraryLoader::GetModuleHandleW,
+        System::{LibraryLoader::GetModuleHandleW, Threading::GetCurrentThreadId},
         UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_CONTROL, VK_LWIN, VK_MENU, VK_RWIN, VK_SHIFT, VK_SNAPSHOT},
         UI::WindowsAndMessaging::{
-            CallNextHookEx, GetMessageW, SetWindowsHookExW, HC_ACTION, KBDLLHOOKSTRUCT, MSG, WH_KEYBOARD_LL,
-            WM_KEYDOWN, WM_SYSKEYDOWN,
+            CallNextHookEx, GetMessageW, PostThreadMessageW, SetWindowsHookExW, UnhookWindowsHookEx, HC_ACTION,
+            KBDLLHOOKSTRUCT, MSG, WH_KEYBOARD_LL, WM_KEYDOWN, WM_QUIT, WM_SYSKEYDOWN,
         },
     };
 
     static APP: OnceLock<AppHandle> = OnceLock::new();
     static INSTALLED: AtomicBool = AtomicBool::new(false);
+    /// the thread that owns the hook, so it can be asked to stop
+    static THREAD: AtomicU32 = AtomicU32::new(0);
     /// Swoop took this press (swallow its key-up too)
     static TAKEN: AtomicBool = AtomicBool::new(false);
     /// a press with a modifier, passed on (pass its key-up on too)
@@ -399,16 +476,25 @@ mod print_key {
         // the hook runs on the thread that set it, which must keep pumping messages
         std::thread::spawn(move || unsafe {
             let h = SetWindowsHookExW(WH_KEYBOARD_LL, Some(hook), GetModuleHandleW(std::ptr::null()), 0);
+            THREAD.store(GetCurrentThreadId(), Ordering::SeqCst);
             let _ = tx.send(!h.is_null());
             if h.is_null() {
                 return;
             }
             let mut msg: MSG = std::mem::zeroed();
             while GetMessageW(&mut msg, std::ptr::null_mut(), 0, 0) > 0 {}
+            UnhookWindowsHookEx(h);
         });
         let ok = rx.recv().unwrap_or(false);
         INSTALLED.store(ok, Ordering::SeqCst);
         ok
+    }
+
+    /// Gives Print Screen back: ends the hook thread, which removes the hook.
+    pub fn uninstall() {
+        if INSTALLED.swap(false, Ordering::SeqCst) {
+            unsafe { PostThreadMessageW(THREAD.load(Ordering::SeqCst), WM_QUIT, 0, 0) };
+        }
     }
 }
 
@@ -419,6 +505,7 @@ fn get_settings(app: AppHandle) -> SettingsView {
         version: app.package_info().version.to_string(),
         platform: std::env::consts::OS,
         hotkey_ok,
+        print_screen: load_settings(&app).print_screen,
         wayland: cfg!(target_os = "linux") && std::env::var_os("WAYLAND_DISPLAY").is_some(),
         print_screen_taken: print_screen_taken_by_windows(hotkey_ok),
         autostart: app.autolaunch().is_enabled().unwrap_or(false),
@@ -435,6 +522,12 @@ fn apply_autostart(app: &AppHandle, on: bool) -> Result<bool, String> {
         let _ = item.set_checked(now);
     }
     Ok(now)
+}
+
+#[tauri::command]
+fn set_print_screen(app: AppHandle, on: bool) -> SettingsView {
+    apply_print_screen(&app, on);
+    get_settings(app)
 }
 
 #[tauri::command]
@@ -506,7 +599,15 @@ fn open_settings(app: &AppHandle) {
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let autostart_label = if cfg!(windows) { "Start with Windows" } else { "Start when I log in" };
-    let capture = MenuItem::with_id(app, "capture", "Capture an area\tPrint Screen", true, None::<&str>)?;
+    let capture = MenuItem::with_id(app, "capture", "Capture an area", true, None::<&str>)?;
+    let print = CheckMenuItem::with_id(
+        app,
+        "print",
+        "Print Screen opens Swoop",
+        true,
+        load_settings(app).print_screen,
+        None::<&str>,
+    )?;
     let folder = MenuItem::with_id(app, "folder", "Open the screenshots folder", true, None::<&str>)?;
     let autostart = CheckMenuItem::with_id(
         app,
@@ -524,6 +625,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             &capture,
             &folder,
             &PredefinedMenuItem::separator(app)?,
+            &print,
             &autostart,
             &settings,
             &PredefinedMenuItem::separator(app)?,
@@ -531,14 +633,19 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         ],
     )?;
     *app.state::<AppState>().autostart_item.lock().unwrap() = Some(autostart);
+    *app.state::<AppState>().print_item.lock().unwrap() = Some(print);
 
     let mut tray = TrayIconBuilder::with_id("swoop")
-        .tooltip("Swoop: press Print Screen to capture")
+        .tooltip("Swoop: click to capture an area")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id().as_ref() {
             "capture" => start_capture(app, 250),
             "folder" => open_folder_now(app),
+            "print" => {
+                let on = !load_settings(app).print_screen;
+                apply_print_screen(app, on);
+            }
             "autostart" => {
                 let on = !app.autolaunch().is_enabled().unwrap_or(false);
                 let _ = apply_autostart(app, on);
@@ -614,6 +721,7 @@ pub fn run() {
             save_image,
             get_settings,
             set_autostart,
+            set_print_screen,
             choose_folder,
             open_folder,
             open_keyboard_settings,

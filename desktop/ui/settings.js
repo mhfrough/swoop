@@ -13,11 +13,19 @@
   $('autostart').checked = s.autostart;
   if (!windows) $('auto-label').textContent = 'Start when I log in';
   function showKeyNotes(v) {
-    const taken = windows && v.print_screen_taken;
+    const on = v.print_screen;
+    const taken = on && windows && v.print_screen_taken;
+    $('printscreen').checked = on;
+    $('how').hidden = !on;
+    $('how-off').hidden = on;
     $('taken').hidden = !taken;
-    $('nokey').hidden = v.hotkey_ok || taken || wayland;
+    $('nokey').hidden = !on || v.hotkey_ok || taken || wayland;
   }
   showKeyNotes(s);
+  $('printscreen').addEventListener('change', async (e) => {
+    try { showKeyNotes(await invoke('set_print_screen', { on: e.target.checked })); }
+    catch (err) { e.target.checked = !e.target.checked; }
+  });
   $('wayland').hidden = !wayland;
 
   $('autostart').addEventListener('change', async (e) => {

@@ -28,6 +28,7 @@ function mockTauri({ settings } = {}) {
           case 'save_image': return 'C:\\Users\\me\\Pictures\\Swoop\\shot.png';
           case 'get_settings': return settings;
           case 'set_autostart': return args.on;
+          case 'set_print_screen': return Object.assign({}, settings, { print_screen: args.on, hotkey_ok: args.on });
           default: return null;
         }
       },
@@ -94,7 +95,7 @@ test('the settings window shows the Snipping Tool warning and the save folder', 
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.addInitScript(mockTauri, {
-    settings: { version: '0.1.0', platform: 'windows', hotkey_ok: false, wayland: false, print_screen_taken: true, autostart: true, save_dir: 'C:\\Users\\me\\Pictures\\Swoop' },
+    settings: { version: '0.1.0', platform: 'windows', hotkey_ok: false, print_screen: true, wayland: false, print_screen_taken: true, autostart: true, save_dir: 'C:\\Users\\me\\Pictures\\Swoop' },
   });
   await page.goto('/desktop/ui/settings.html');
   await expect(page.locator('#folder')).toHaveText('C:\\Users\\me\\Pictures\\Swoop');
@@ -113,9 +114,32 @@ test('the settings window shows the Snipping Tool warning and the save folder', 
   expect(errors).toEqual([]);
 });
 
+test('the Print Screen switch gives the key back and takes it again', async ({ page }) => {
+  await page.addInitScript(mockTauri, {
+    settings: { version: '0.1.2', platform: 'windows', hotkey_ok: true, print_screen: true, wayland: false, print_screen_taken: false, autostart: true, save_dir: 'C:\Users\me\Pictures\Swoop' },
+  });
+  await page.goto('/desktop/ui/settings.html');
+  const sw = page.locator('#printscreen');
+  await expect(sw).toBeChecked();
+  await expect(page.locator('#how')).toBeVisible();
+  await expect(page.locator('#how-off')).toBeHidden();
+
+  await sw.click();
+  await expect(sw).not.toBeChecked();
+  await expect(page.locator('#how')).toBeHidden();
+  await expect(page.locator('#how-off')).toBeVisible();
+  await expect(page.locator('#nokey')).toBeHidden();
+
+  await sw.click();
+  await expect(sw).toBeChecked();
+  await expect(page.locator('#how')).toBeVisible();
+  const calls = await page.evaluate(() => window.__calls.filter((c) => c.cmd === 'set_print_screen').map((c) => c.args.on));
+  expect(calls).toEqual([false, true]);
+});
+
 test('the settings window explains Wayland on Linux', async ({ page }) => {
   await page.addInitScript(mockTauri, {
-    settings: { version: '0.1.0', platform: 'linux', hotkey_ok: true, wayland: true, print_screen_taken: false, autostart: false, save_dir: '/home/me/Pictures/Swoop' },
+    settings: { version: '0.1.0', platform: 'linux', hotkey_ok: true, print_screen: true, wayland: true, print_screen_taken: false, autostart: false, save_dir: '/home/me/Pictures/Swoop' },
   });
   await page.goto('/desktop/ui/settings.html');
   await expect(page.locator('#wayland')).toBeVisible();

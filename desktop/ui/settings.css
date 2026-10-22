@@ -68,6 +68,7 @@ main { display: grid; gap: 12px; }
 
 .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; }
 .row + .row { border-top: 1px solid var(--line); }
+.row-top { padding-top: 0; margin-bottom: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
 .row > span:first-child { min-width: 0; }
 .label { display: block; font-weight: 550; }
 .hint { display: block; color: var(--ink-3); font-size: 12.5px; }
