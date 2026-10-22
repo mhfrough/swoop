@@ -128,17 +128,33 @@
 
   const demo = $('#demo');
   if (demo && window.SwoopEditor) {
+    let started = false;
     const start = async () => {
+      if (started) return;
+      started = true;
       try { await document.fonts.load('600 16px Geist'); } catch (e) {}
+      // a phone shows the sample at about 350 px wide: 1x is plenty there, and four times less work
+      const pr = innerWidth < 900 ? 1 : Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
+      const image = samplePage(pr);
+      await new Promise((r) => setTimeout(r));   // let the page breathe between drawing and the editor
       await SwoopEditor.create(demo, {
         layout: 'full',
-        image: samplePage(2),
-        pixelRatio: 2,
+        image,
+        pixelRatio: pr,
         name: 'swoop-demo',
         keys: 'focus',
         wheelPan: false,
       });
     };
-    start();
+    // draw it once it is near the screen, and never ahead of the first paint
+    const soon = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 1200 }) : setTimeout(start, 200));
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { io.disconnect(); soon(); }
+      }, { rootMargin: '300px 0px' });
+      io.observe(demo);
+    } else {
+      soon();
+    }
   }
 })();

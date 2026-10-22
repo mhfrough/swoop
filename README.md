@@ -134,7 +134,7 @@ How the full-page capture works, why the desktop app uses Tauri, and what is pla
 
 ## Release a new version
 
-1. Update the version in `extension/manifest.json`, `desktop/src-tauri/tauri.conf.json`, `desktop/src-tauri/Cargo.toml` and `desktop/package.json`.
+1. Update the version in `extension/manifest.json`, `desktop/src-tauri/tauri.conf.json`, `desktop/src-tauri/Cargo.toml`, `desktop/package.json`, and in `index.html` (the download section and the `softwareVersion` fields of the structured data). A test checks that they match.
 2. Commit, then push a tag: `git tag v0.2.0 && git push origin v0.2.0`.
 3. GitHub Actions builds the Windows installer, the Linux packages and the extension zip, and attaches them to a new release.
 

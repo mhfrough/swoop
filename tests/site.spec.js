@@ -170,3 +170,24 @@ test('link previews use a 1200 x 630 image that exists', async ({ page, request 
   expect(size).toEqual([1200, 630]);
   expect((await res.body()).length).toBeLessThan(300 * 1024);
 });
+
+test('structured data matches the page and the current version', async ({ page, request }) => {
+  await page.goto('/');
+  const data = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+  const types = data['@graph'].map((g) => g['@type']);
+  expect(types).toEqual(['WebSite', 'Person', 'SoftwareApplication', 'SoftwareApplication', 'FAQPage']);
+  const manifest = await (await request.get('/extension/manifest.json')).json();
+  for (const app of data['@graph'].filter((g) => g['@type'] === 'SoftwareApplication')) {
+    expect(app.softwareVersion, app.name).toBe(manifest.version);
+    expect(app.offers.price).toBe('0');
+  }
+  await expect(page.locator('#download .sub .num')).toHaveText(manifest.version);
+  // the FAQ schema is the page's own questions, in order
+  const faq = data['@graph'].find((g) => g['@type'] === 'FAQPage').mainEntity.map((q) => q.name);
+  expect(faq).toEqual(await page.locator('.faq summary').allTextContents());
+  // search engine files
+  expect((await request.get('/robots.txt')).status()).toBe(200);
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).toContain('<loc>https://mhfrough.github.io/swoop/</loc>');
+  expect(sitemap).toContain('<loc>https://mhfrough.github.io/swoop/privacy.html</loc>');
+});

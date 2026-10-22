@@ -10,6 +10,15 @@
   font-style: normal;
   font-display: swap;
 }
+/* Arial, resized to Geist's width and height, so text keeps its line breaks when Geist arrives */
+@font-face {
+  font-family: "Geist Fallback";
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans");
+  size-adjust: 101.5%;
+  ascent-override: 99.5%;
+  descent-override: 29.6%;
+  line-gap-override: 0%;
+}
 @font-face {
   font-family: "Geist Mono";
   src: url("assets/fonts/GeistMono-Variable.woff2") format("woff2");
@@ -43,6 +52,7 @@
   --accent-ink: #141210;
   --accent-text: #c2410c;
   --accent-soft: rgba(255, 90, 31, 0.12);
+  --accent-on-inverse: #ff7a3d;  /* accent text on the inverted band (dark in light mode): 6.9:1 */
 
   /* meaning, separate from the accent */
   --good: #076a3d;
@@ -58,7 +68,7 @@
   --shadow-panel: 0 1px 0 rgba(20, 18, 16, 0.04), 0 1px 3px rgba(20, 18, 16, 0.06);
 
   /* type */
-  --font: "Geist", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font: "Geist", "Geist Fallback", ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "SF Mono", Consolas, monospace;
 
   --text-xs: 0.75rem;      /* 12 */
@@ -114,6 +124,7 @@
     --accent-ink: #141210;
     --accent-text: #ff7a3d;
     --accent-soft: rgba(255, 106, 43, 0.16);
+    --accent-on-inverse: #b23a0c;   /* the inverted band is light in dark mode: 6.2:1 */
     --good: #3ccf8e; --good-soft: rgba(60, 207, 142, 0.14);
     --bad: #ff6b6b; --bad-soft: rgba(255, 107, 107, 0.14);
     --stage: #0a0a0b;
@@ -139,6 +150,7 @@
   --accent-ink: #141210;
   --accent-text: #ff7a3d;
   --accent-soft: rgba(255, 106, 43, 0.16);
+  --accent-on-inverse: #b23a0c;
   --good: #3ccf8e; --good-soft: rgba(60, 207, 142, 0.14);
   --bad: #ff6b6b; --bad-soft: rgba(255, 107, 107, 0.14);
   --stage: #0a0a0b;

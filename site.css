@@ -106,7 +106,7 @@
 .band-alt { background: var(--bg-sunken); }
 .band-ink { background: var(--ink); color: var(--ink-inverse); }
 .band h2 { font-size: var(--text-xl); line-height: 1.1; letter-spacing: var(--tracking-display); max-width: 18ch; }
-.band-ink .kicker, .band-ink .text-link { color: var(--accent); }
+.band-ink .kicker, .band-ink .text-link { color: var(--accent-on-inverse); }
 .band-ink p { color: color-mix(in srgb, var(--ink-inverse) 78%, transparent); }
 .band-ink ::selection { color: var(--ink-inverse); }
 @media (max-width: 640px) { .band { padding: var(--s-16) 0; } }
