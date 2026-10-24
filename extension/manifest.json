@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Swoop: full page screenshot",
   "short_name": "Swoop",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Capture a whole web page as one image, then mark it up and save it. Nothing is uploaded.",
   "minimum_chrome_version": "116",
   "icons": {
