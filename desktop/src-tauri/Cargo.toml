@@ -1,9 +1,10 @@
 [package]
 name = "swoop"
 version = "0.1.3"
-description = "Swoop: press Print Screen, select an area, mark it up and save."
-authors = ["Mohammad Hamza"]
+description = "Swoop: screenshots that stay on your computer. Press Print Screen, select an area, mark it up, then copy or save."
+authors = ["mhfrough <https://github.com/mhfrough>"]
 license = "MIT"
+homepage = "https://mhfrough.github.io/swoop/"
 repository = "https://github.com/mhfrough/swoop"
 edition = "2021"
 rust-version = "1.80"

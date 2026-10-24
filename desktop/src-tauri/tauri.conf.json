@@ -38,9 +38,10 @@
       "appimage"
     ],
     "category": "Utility",
-    "shortDescription": "Screenshots: select, mark up, save",
-    "longDescription": "Swoop sits in the tray. Press Print Screen, drag over any part of the screen, add arrows, boxes, text, numbered steps or blur, then copy or save. Nothing is uploaded.",
-    "copyright": "Copyright 2026 Mohammad Hamza. MIT licence.",
+    "shortDescription": "Swoop: screenshots that stay on your computer",
+    "longDescription": "Swoop is a tiny, free screenshot app for Windows and Linux. It waits in the tray: press Print Screen, drag over any part of the screen, mark it up with arrows, boxes, ellipses, lines, pen, highlighter, text, numbered steps, blur and crop, then copy or save. No account, no watermark, and nothing is uploaded.",
+    "copyright": "© 2026 mhfrough (Mohammad Hamza). MIT licence.",
+    "license": "MIT",
     "homepage": "https://mhfrough.github.io/swoop/",
     "icon": [
       "icons/32x32.png",
@@ -76,6 +77,6 @@
         "desktopTemplate": "installer/swoop.desktop"
       }
     },
-    "publisher": "Mohammad Hamza"
+    "publisher": "mhfrough"
   }
 }
