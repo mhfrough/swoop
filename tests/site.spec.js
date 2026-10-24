@@ -60,13 +60,13 @@ test('the GitHub star button shows the count', async ({ page }) => {
 test('the bottom section links to the other projects, not to Swoop', async ({ page }) => {
   await page.goto('/');
   const cards = page.locator('#more .more-card');
-  await expect(cards).toHaveCount(4);
-  expect(await cards.locator('.more-name').allTextContents()).toEqual(['Flick', 'Pinch', 'Scrawl', 'Sizzle']);
-  for (const name of ['flick', 'pinch', 'scrawl', 'sizzle']) {
+  await expect(cards).toHaveCount(5);
+  expect(await cards.locator('.more-name').allTextContents()).toEqual(['Flick', 'Pinch', 'Scrawl', 'Sizzle', 'Jot']);
+  for (const name of ['flick', 'pinch', 'scrawl', 'sizzle', 'jot']) {
     await expect(page.locator(`#more a[href="https://mhfrough.github.io/${name}/"]`)).toHaveCount(1);
   }
   await expect(page.locator('#more a[href*="/swoop"]')).toHaveCount(0);
-  await expect(page.locator('#more .more-ico')).toHaveCount(4);
+  await expect(page.locator('#more .more-ico')).toHaveCount(5);
 });
 
 test('in-page links land on a section and local links load', async ({ page, request }) => {
