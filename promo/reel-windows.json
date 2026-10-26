@@ -1,0 +1,148 @@
+{
+  "name": "swoop-windows-reel",
+  "root": "..",
+  "page": "promo/swoop-windows-reel.html",
+  "port": 8176,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "scale": 2,
+  "crf": 16,
+  "work": "promo/.reel-work",
+  "out": "videos/swoop-windows-reel.mp4",
+  "poster_t": 9.6,
+  "music": {
+    "file": "promo/swoop-windows-bgm.mp3",
+    "offset": 28.29,
+    "gain_db": -14,
+    "fade_out": 1.2
+  },
+  "voiceover": {
+    "file": "promo/swoop-windows-voiceover.wav",
+    "offset": 0.0,
+    "mute": "",
+    "duck_db": -9
+  },
+  "sfx": [
+    {
+      "file": "promo/sfx/windows/keycap.wav",
+      "at": "press-.03",
+      "gain_db": -4
+    },
+    {
+      "file": "promo/sfx/windows/impact.wav",
+      "at": "press",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/windows/glitch.wav",
+      "at": "freeze+.05",
+      "gain_db": -20,
+      "len": 0.5
+    },
+    {
+      "file": "promo/sfx/windows/swipe.wav",
+      "at": "drag+.35",
+      "gain_db": -18,
+      "pan": 0.3
+    },
+    {
+      "file": "promo/sfx/windows/pop.wav",
+      "at": "bar",
+      "gain_db": -16
+    },
+    {
+      "file": "promo/sfx/windows/click.wav",
+      "at": "bar+0.75",
+      "gain_db": -13
+    },
+    {
+      "file": "promo/sfx/windows/click.wav",
+      "at": "bar+1.2",
+      "gain_db": -13
+    },
+    {
+      "file": "promo/sfx/windows/click.wav",
+      "at": "bar+1.55",
+      "gain_db": -13
+    },
+    {
+      "file": "promo/sfx/windows/click.wav",
+      "at": "bar+2.3",
+      "gain_db": -13
+    },
+    {
+      "file": "promo/sfx/windows/keycap.wav",
+      "at": "copy-.02",
+      "gain_db": -6,
+      "pan": 0.3
+    },
+    {
+      "file": "promo/sfx/windows/whoosh.wav",
+      "at": "copy-.2",
+      "gain_db": -18,
+      "pan": 0.3
+    },
+    {
+      "file": "promo/sfx/windows/notif.wav",
+      "at": "copy+.3",
+      "gain_db": -16
+    },
+    {
+      "file": "promo/sfx/windows/tick.wav",
+      "at": "specs+0.35",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/windows/tick.wav",
+      "at": "specs+0.6",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/windows/tick.wav",
+      "at": "specs+0.85",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/windows/whoosh.wav",
+      "at": "endc-.5",
+      "gain_db": -16
+    },
+    {
+      "file": "promo/sfx/windows/chime.wav",
+      "at": "endc+.45",
+      "gain_db": -18
+    },
+    {
+      "file": "promo/sfx/windows/type-url.wav",
+      "at": "url",
+      "gain_db": -20
+    }
+  ],
+  "sfx_duck_db": -4,
+  "direction": {
+    "concept": "metaphor",
+    "aspect": "9:16",
+    "length": 21.5,
+    "tone": "saturated",
+    "palette": [
+      "#ff5a1f",
+      "#141210",
+      "#fff7f2",
+      "#0d0d0f"
+    ],
+    "display_font": "Geist",
+    "type": "giant-condensed",
+    "motion": "snappy",
+    "camera": "zoom-through",
+    "composition": "flush-left",
+    "demo": "full-bleed-ui",
+    "opening": "object",
+    "ending": "end-card",
+    "texture": "grain",
+    "signature": "a giant Print Screen key is pressed and rushes past the camera into the frozen screen",
+    "music": "house",
+    "bpm": 122,
+    "sfx": "digital"
+  }
+}

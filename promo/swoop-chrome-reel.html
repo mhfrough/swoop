@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swoop for Chrome: the whole page</title>
+<!--
+  Swoop for Chrome promo reel (9:16, 23 s). Built on the Sizzle reel engine (parts marked ENGINE).
+  Brand from ../tokens.css (Geist, swoop orange), editor icons copied from shared/editor/editor.js.
+  The shop page is invented demo content (Aster & Co., aster.example). Every time is in CUES.
+  Preview: serve the repo root (python -m http.server 8176) and open /promo/swoop-chrome-reel.html
+-->
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/* ================= ENGINE (keep) ================= */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:#000;overflow:hidden}
+#reel{position:absolute;left:0;top:0;width:calc(var(--W) * 1px);height:calc(var(--H) * 1px);overflow:hidden;transform-origin:0 0;
+  -webkit-font-smoothing:antialiased}
+body.hold *,body.hold *::before,body.hold *::after{animation-play-state:paused !important}
+#reel.measure,#reel.measure *{animation:none !important;transition:none !important}
+.r-clock{position:absolute;width:1px;height:1px;animation:r-clock var(--end) linear 0s both}
+@keyframes r-clock{from{opacity:0}to{opacity:0}}
+.r-ui{position:fixed;right:16px;bottom:16px;display:flex;gap:8px;align-items:center;z-index:99;font:600 14px/1 system-ui;color:#eee}
+.r-ui button{min-height:40px;padding:0 16px;border:0;border-radius:999px;background:#eee;color:#111;font:inherit;cursor:pointer}
+.r-ui span{padding:12px 14px;border-radius:999px;background:#222;font-variant-numeric:tabular-nums}
+.render .r-ui{display:none}
+
+/* ================= THIS REEL ================= */
+:root{
+  --night:#09090b; --night-2:#141417; --ink-d:#f4f3f1; --ink-d2:#c9c6c1;
+  --or:#ff5a1f; --or-2:#ff7a3d; --ink-l:#141210;
+  --mark:#ff3b30;
+  --e:cubic-bezier(.16,1,.3,1);          /* long cinematic ease-out */
+  --eio:cubic-bezier(.65,0,.35,1);
+  --spring:cubic-bezier(.34,1.5,.64,1);
+}
+#reel{background:var(--night);color:var(--ink-d);font-family:var(--font);letter-spacing:-.01em}
+
+/* atmosphere: a slow orange bloom behind everything, and film grain on top */
+.bloom{position:absolute;left:-30%;top:18%;width:160%;height:70%;
+  background:radial-gradient(closest-side,rgba(255,90,31,.20),rgba(255,90,31,.06) 55%,transparent);
+  filter:blur(40px);opacity:.0;animation:bloom var(--end) linear 0s both}
+@keyframes bloom{0%{opacity:0;transform:translateY(60px)}12%{opacity:.7}60%{opacity:1;transform:translateY(-40px)}100%{opacity:.6;transform:translateY(-80px)}}
+.grain{position:absolute;inset:-40px;z-index:60;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .5s steps(4) 0s infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-14px,9px)}50%{transform:translate(11px,-12px)}75%{transform:translate(-7px,-5px)}100%{transform:translate(0,0)}}
+.vignette{position:absolute;inset:0;z-index:59;pointer-events:none;background:radial-gradient(120% 80% at 50% 45%,transparent 55%,rgba(0,0,0,.55))}
+
+/* ---------- headlines ---------- */
+.hl{position:absolute;left:72px;right:72px;top:206px;z-index:20;margin:0;font-weight:640;font-size:102px;line-height:.98;letter-spacing:-.055em}
+.hl .ln{display:block;overflow:hidden;padding:.06em 0 .12em;margin:-.06em 0 -.12em}
+.hl .w{display:inline-block;animation:wup 1s var(--e) calc(var(--d) + var(--i) * .07s) both,wout .5s var(--eio) var(--o) forwards}
+@keyframes wup{from{transform:translateY(112%) rotate(4deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes wout{to{transform:translateY(-135%);opacity:0}}
+.hl .or{color:var(--or)}
+.sub{position:absolute;left:76px;right:76px;top:356px;z-index:20;margin:0;font-size:38px;font-weight:450;color:var(--ink-d2);letter-spacing:-.02em;
+  animation:fadeup .9s var(--e) var(--d) both,fadeout .4s var(--eio) var(--o) forwards}
+.sub b{color:var(--ink-d);font-weight:560}
+@keyframes fadeup{from{opacity:0;transform:translateY(24px);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fadeout{to{opacity:0;transform:translateY(-12px);filter:blur(6px)}}
+.fx-in{animation:fadeup .9s var(--e) var(--d) both,fadeout .4s var(--eio) var(--o) forwards}
+
+/* ---------- the demo page (Aster & Co., invented) ---------- */
+.pg{position:relative;width:940px;height:5000px;background:#f7f6f3;color:#141210;font-family:var(--font);letter-spacing:-.015em;overflow:hidden}
+.pg *{margin:0}
+.pg-head{position:absolute;left:0;top:0;width:940px;height:88px;display:flex;align-items:center;gap:22px;padding:0 36px;background:#fff;box-shadow:0 1px 0 rgba(20,18,16,.08);z-index:2}
+.pg-logo{width:40px;height:40px;border-radius:12px;background:#141210;display:grid;place-items:center}
+.pg-logo i{width:16px;height:16px;border-radius:50%;background:#e9b9a0}
+.pg-brand{font-size:28px;font-weight:620;letter-spacing:-.03em}
+.pg-nav{display:flex;gap:28px;margin-left:auto;font-size:22px;color:#4b4844}
+.pg-cart{height:46px;padding:0 20px;border-radius:999px;background:#141210;color:#fff;font-size:20px;font-weight:560;display:flex;align-items:center}
+.pg-sec{position:absolute;left:30px;right:30px}
+.pg-h{font-size:58px;font-weight:640;letter-spacing:-.045em;line-height:1.02}
+.pg-h2{font-size:44px;font-weight:620;letter-spacing:-.035em}
+.pg-p{font-size:24px;line-height:1.45;color:#4b4844}
+.pg-btn{display:inline-flex;align-items:center;height:60px;padding:0 30px;border-radius:999px;background:#141210;color:#fff;font-size:22px;font-weight:560}
+.pg-img{border-radius:22px;position:relative;overflow:hidden}
+.pg-card{background:#fff;border-radius:22px;box-shadow:0 1px 3px rgba(20,18,16,.06)}
+.vase{position:absolute;bottom:0;border-radius:46% 46% 18% 18% / 60% 60% 14% 14%}
+.sun{position:absolute;border-radius:50%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.prod .pg-img{height:300px}
+.prod p{font-size:24px;font-weight:560;margin-top:14px}
+.prod span{font-size:22px;color:#6b6762}
+.stars{color:#ff9500;font-size:24px;letter-spacing:2px}
+.rv{padding:28px 30px}
+.rv p{font-size:23px;line-height:1.45;color:#2a2724;margin-top:10px}
+.rv span{display:block;font-size:20px;color:#6b6762;margin-top:12px}
+.row{display:flex;align-items:center;gap:22px;padding:22px 26px}
+.row + .row{border-top:1px solid rgba(20,18,16,.08)}
+.thumb{width:84px;height:84px;border-radius:14px;flex:none}
+.row b{font-weight:560;font-size:24px}
+.row em{font-style:normal;margin-left:auto;font-size:24px;font-variant-numeric:tabular-nums}
+.row small{display:block;font-size:20px;color:#6b6762}
+.pg-cookie{position:absolute;left:0;right:0;bottom:0;height:92px;background:#141210;color:#e9e7e3;display:flex;align-items:center;gap:20px;padding:0 36px;font-size:21px}
+.pg-cookie .ok{margin-left:auto;height:48px;padding:0 24px;border-radius:999px;background:#fff;color:#141210;font-weight:560;display:flex;align-items:center}
+
+/* ---------- browser window ---------- */
+.win{position:absolute;left:70px;top:430px;width:940px;height:1064px;border-radius:20px;overflow:hidden;z-index:5;
+  background:#1d1d21;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)}
+.chrome{position:absolute;left:0;top:0;right:0;height:64px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#1d1d21}
+.dots{display:flex;gap:9px}.dots i{width:13px;height:13px;border-radius:50%;background:#3a3a40}
+.url{flex:1;height:40px;border-radius:999px;background:#2a2a30;color:#c9c6c1;font-size:19px;display:flex;align-items:center;padding:0 18px;gap:10px;font-family:var(--font)}
+.url svg{width:16px;height:16px;fill:none;stroke:#8f8c87;stroke-width:1.6}
+.ext{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;position:relative}
+.ext img{width:28px;height:28px;border-radius:7px}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6b6762,#3a3a40)}
+.vp{position:absolute;left:0;top:64px;width:940px;height:1000px;overflow:hidden;background:#f7f6f3}
+.vp .pg{position:absolute;left:0;top:0}
+.vp .sticky{position:absolute;left:0;top:0;z-index:4;color:#141210}
+.vp .cookie-fixed{color:#e9e7e3}
+.vp .cookie-fixed{position:absolute;left:0;right:0;bottom:0;z-index:4}
+.vp .pg .pg-cookie{display:none}
+
+/* the "screen only" flash */
+.flash{position:absolute;inset:0;z-index:6;background:#fff;opacity:0}
+.shot-frame{position:absolute;inset:10px;z-index:6;border:3px solid #fff;border-radius:12px;opacity:0;box-shadow:0 0 0 9999px rgba(9,9,11,.35)}
+.shot-tag{position:absolute;left:24px;top:24px;z-index:7;padding:10px 16px;border-radius:10px;background:rgba(12,12,14,.86);color:#fff;font:500 21px var(--font-mono)}
+
+/* scanning */
+.scan{position:absolute;left:0;right:0;top:0;height:6px;z-index:5;background:var(--or);box-shadow:0 0 30px 6px rgba(255,90,31,.6);opacity:0}
+.scan::before{content:"";position:absolute;left:0;right:0;bottom:6px;height:260px;background:linear-gradient(to top,rgba(255,90,31,.20),transparent)}
+.count{position:absolute;left:0;right:0;bottom:120px;margin:auto;width:max-content;z-index:8;height:60px;padding:0 26px;border-radius:999px;
+  background:var(--or);color:var(--ink-l);font:600 24px var(--font-mono);display:flex;align-items:center;gap:12px;white-space:nowrap;
+  box-shadow:0 12px 40px rgba(255,90,31,.45)}
+.count i{width:12px;height:12px;border-radius:50%;background:var(--ink-l);animation:blink .6s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+
+/* cursor */
+.cursor{position:absolute;left:0;top:0;z-index:30;width:46px;height:46px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.ripple{position:absolute;z-index:29;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:3px solid var(--or);opacity:0}
+
+/* the swoop curve */
+.curve{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:25;pointer-events:none;overflow:visible}
+
+/* ---------- the tall image (clone of the page) ---------- */
+.tallw{position:absolute;left:0;top:0;z-index:6;transform-origin:0 0}
+.tall{position:relative}
+.seam{position:absolute;left:-30px;right:-30px;height:14px;margin-top:-7px;background:var(--or);z-index:5;box-shadow:0 0 50px 10px rgba(255,90,31,.6)}
+.tag{position:absolute;z-index:7;font:600 34px var(--font-mono);color:var(--ink-d);white-space:nowrap}
+.tag b{color:var(--or);font-weight:600}
+.tag{animation:fadeup .8s var(--e) var(--d) both,fadeout .4s var(--eio) var(--o) forwards}
+.fmt{text-align:right;line-height:1.5}
+.spec{position:absolute;left:0;right:0;top:1580px;z-index:20;text-align:center;font:500 30px var(--font-mono);color:var(--ink-d2);letter-spacing:0}
+.spec b{color:var(--ink-d);font-weight:600}
+
+/* ---------- editor ---------- */
+.ed{position:absolute;left:50px;top:404px;width:980px;height:1010px;border-radius:24px;overflow:hidden;z-index:4;background:#e6e5e0;
+  box-shadow:0 50px 140px rgba(0,0,0,.6)}
+.ed-bar{position:absolute;left:0;right:0;top:0;height:76px;background:#fff;display:flex;align-items:center;gap:4px;padding:0 12px;border-bottom:1px solid rgba(20,18,16,.08)}
+.ed .se-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;min-width:52px;padding:0 10px;border-radius:12px;color:#4b4844;font-weight:560;font-size:20px;transition:none}
+.ed .se-btn[aria-pressed="true"]{background:var(--or);color:var(--ink-l)}
+.ed .se-ico{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ed .sep{width:1px;height:36px;background:rgba(20,18,16,.1);margin:0 6px}
+.ed .sw{width:26px;height:26px;border-radius:50%;margin:0 4px;box-shadow:inset 0 0 0 1px rgba(128,128,128,.4)}
+.ed .sw.on{box-shadow:0 0 0 3px #fff,0 0 0 5.5px #141210;transform:scale(.86)}
+.ed .grow{flex:1}
+.ed .save{background:var(--or);color:var(--ink-l);padding:0 18px 0 14px}
+.toast{position:absolute;left:0;right:0;margin:auto;width:max-content;top:1300px;z-index:12;height:66px;padding:0 28px;border-radius:999px;background:#141210;color:#fff;
+  display:flex;align-items:center;gap:12px;font:560 25px var(--font);white-space:nowrap;box-shadow:0 20px 50px rgba(0,0,0,.4);
+  animation:pop .5s var(--spring) var(--d) both,fadeout .35s var(--eio) var(--o) forwards}
+.toast svg{width:26px;height:26px;fill:none;stroke:#3ccf8e;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.9)}to{opacity:1;transform:none}}
+
+/* marks drawn on the page (page coordinates) */
+.marks{position:absolute;left:0;top:0;width:940px;height:5000px;z-index:3;overflow:visible;pointer-events:none}
+.draw{stroke-dasharray:1 2;stroke-dashoffset:1;visibility:hidden;animation:draw .55s var(--eio) var(--d) both}
+@keyframes draw{0%{visibility:hidden;stroke-dashoffset:1}.1%{visibility:visible}100%{visibility:visible;stroke-dashoffset:0}}
+.badge{position:absolute;z-index:4;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:var(--mark);color:#fff;
+  display:grid;place-items:center;font:640 28px var(--font);box-shadow:0 0 0 4px #fff;animation:bpop .45s var(--spring) var(--d) both}
+@keyframes bpop{from{transform:scale(0)}to{transform:none}}
+.mosaic{position:absolute;z-index:3;clip-path:inset(0 100% 0 0);animation:wipe .5s steps(6) var(--d) both}
+@keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+
+/* ---------- private ---------- */
+.nope{position:absolute;left:76px;top:560px;z-index:20;display:flex;flex-direction:column;gap:30px}
+.nope li{list-style:none;position:relative;font-size:74px;font-weight:600;letter-spacing:-.045em;color:var(--ink-d);width:max-content;
+  animation:fadeup .7s var(--e) var(--d) both,fadeout .4s var(--eio) var(--o) forwards}
+.nope li::after{content:"";position:absolute;left:-8px;right:-8px;top:54%;height:9px;border-radius:9px;background:var(--or);
+  transform-origin:0 50%;transform:scaleX(0);animation:strike .45s var(--eio) var(--s) both}
+@keyframes strike{to{transform:scaleX(1)}}
+.nope li.dim{color:#5b5955;transition:none}
+.yours{position:absolute;left:76px;top:1170px;z-index:20;font-size:46px;font-weight:560;letter-spacing:-.03em;color:var(--ink-d2)}
+.yours b{color:var(--or);font-weight:600}
+
+/* ---------- end ---------- */
+.flood{position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:40;overflow:visible}
+.flood .fill{opacity:0;animation:fillin .35s linear var(--d) both}
+@keyframes fillin{to{opacity:1}}
+.endc{position:absolute;inset:0;z-index:45;color:var(--ink-l)}
+.endc .tile{position:absolute;left:390px;top:470px;width:300px;height:300px;border-radius:76px;background:var(--ink-l);display:grid;place-items:center;
+  box-shadow:0 40px 90px rgba(120,30,0,.35);animation:tile 1s var(--spring) var(--d) both}
+.endc .tile svg{width:190px;height:190px;overflow:visible}
+@keyframes tile{from{transform:scale(.2) rotate(-18deg);opacity:0}to{transform:none;opacity:1}}
+.endc .word{position:absolute;left:0;right:0;top:820px;text-align:center;font-size:210px;font-weight:700;letter-spacing:-.065em;line-height:1}
+.endc .word .c{display:inline-block;animation:cup .8s var(--e) calc(var(--d) + var(--i) * .05s) both}
+@keyframes cup{from{transform:translateY(60%);opacity:0;filter:blur(10px)}to{transform:none;opacity:1;filter:none}}
+.endc .tagl{position:absolute;left:0;right:0;top:1066px;text-align:center;font-size:46px;font-weight:540;letter-spacing:-.03em}
+.endc .pill{position:absolute;left:50%;top:1170px;transform:translateX(-50%);height:96px;padding:0 44px;border-radius:999px;background:var(--ink-l);color:var(--or-2);
+  display:flex;align-items:center;font:560 40px var(--font-mono);letter-spacing:-.02em;white-space:nowrap;min-width:120px;
+  animation:pillin .6s var(--spring) var(--d) both}
+@keyframes pillin{from{opacity:0;transform:translateX(-50%) scale(.6)}to{opacity:1;transform:translateX(-50%)}}
+.endc .pill .caret{display:inline-block;width:4px;height:44px;margin-left:6px;background:var(--or-2);animation:blink .8s steps(2) infinite}
+.endc .facts{position:absolute;left:0;right:0;top:1310px;text-align:center;font:500 30px var(--font-mono);color:rgba(20,18,16,.72);letter-spacing:0}
+</style>
+</head>
+<body class="hold">
+<div id="reel">
+  <div class="r-clock" id="clk"></div>
+  <div class="bloom"></div>
+
+  <!-- 1. open: not just the screen -->
+  <h1 class="hl" id="h-open" data-in="open+.35" data-out="click-.2"><span class="ln">Not just</span><span class="ln">the screen.</span></h1>
+
+  <!-- browser window -->
+  <div class="win" id="win">
+    <div class="chrome">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="url"><svg viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/><path d="M5.5 7V5.25a2.5 2.5 0 0 1 5 0V7"/></svg>aster.example/shop</div>
+      <div class="ext" id="ext"><img src="../icon.svg" alt=""></div>
+      <div class="avatar"></div>
+    </div>
+    <div class="vp" id="vp">
+      <div class="pg-slot" id="slot-win"></div>
+      <div class="sticky" id="sticky"></div>
+      <div class="cookie-fixed" id="cookiefix"></div>
+      <div class="scan" id="scan"></div>
+      <div class="flash" id="flash"></div>
+      <div class="shot-frame" id="shotframe"><span class="shot-tag">Screenshot · 1 screen</span></div>
+    </div>
+    <div class="count fx-in" id="count" data-in="scan" data-out="stitch-.1"><i></i><span id="count-t">Capturing 1 / 5</span></div>
+  </div>
+
+  <h1 class="hl" id="h-scan" data-in="click+.05" data-out="stitch-.15"><span class="ln">The whole</span><span class="ln"><span class="or">page.</span></span></h1>
+  <p class="sub" data-in="scan+.55" data-out="stitch-.15" style="top:1522px;text-align:center;font-size:34px">Sticky headers once. Lazy images loaded.</p>
+
+  <svg class="curve" viewBox="0 0 1080 1920" aria-hidden="true">
+    <path id="curve" class="draw" data-in="click+.08" pathLength="1" fill="none" stroke="#ff5a1f" stroke-width="12" stroke-linecap="round" d="M0 0"/>
+  </svg>
+  <svg class="cursor" id="cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2.8v16.4l4.3-4.1 2.8 6.3 3-1.3-2.8-6.2h5.9z" fill="#fff" stroke="#141210" stroke-width="1.3" stroke-linejoin="round"/></svg>
+  <div class="ripple" id="ripple"></div>
+
+  <!-- 3. stitch: one tall image -->
+  <h1 class="hl" id="h-stitch" data-in="stitch+.2" data-out="mark-.1"><span class="ln">One tall</span><span class="ln">image.</span></h1>
+
+  <!-- 4. editor frame (behind the tall image) -->
+  <div class="ed" id="ed">
+    <div class="ed-bar" id="edbar"></div>
+  </div>
+  <div class="tallw" id="tallw"><div class="tall" id="tall">
+    <div class="pg-slot" id="slot-tall"></div>
+    <div class="seam" style="top:1000px" data-sn="0"></div><div class="seam" style="top:2000px" data-sn="1"></div>
+    <div class="seam" style="top:3000px" data-sn="2"></div><div class="seam" style="top:4000px" data-sn="3"></div>
+    <svg class="marks" viewBox="0 0 940 5000" aria-hidden="true">
+      <!-- highlighter under "Free delivery" -->
+      <path class="draw" data-in="mark+4.25" pathLength="1" d="M58 4436 H330" fill="none" stroke="#ffd60a" stroke-opacity=".5" stroke-width="40" stroke-linecap="butt"/>
+      <!-- box around the total -->
+      <rect class="draw" data-in="mark+1.25" pathLength="1" x="44" y="4478" width="852" height="96" rx="14" fill="none" stroke="#ff3b30" stroke-width="7"/>
+      <!-- arrow to Pay -->
+      <path class="draw" data-in="mark+2.35" pathLength="1" d="M640 4835 C 610 4760, 560 4730, 470 4706" fill="none" stroke="#ff3b30" stroke-width="8" stroke-linecap="round"/>
+      <path class="draw" data-in="mark+2.8" pathLength="1" d="M497 4686 L466 4705 L494 4730" fill="none" stroke="#ff3b30" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="badge" style="left:44px;top:4478px" data-in="mark+1.8">1</div>
+    <div class="badge" style="left:666px;top:4846px" data-in="mark+3.05">2</div>
+    <div class="mosaic" id="mosaic" style="left:520px;top:4140px;width:330px;height:150px" data-in="mark+3.55"></div>
+  </div></div>
+  <div class="tag" id="tag1" data-in="stitch+1.9" data-out="mark-.1">&#8592; <b>5 screens</b></div>
+  <div class="tag" id="tag2" data-in="stitch+2.1" data-out="mark-.1">&#8592; <b>1 picture</b></div>
+  <div class="tag fmt" id="fmt" data-in="stitch+2.4" data-out="mark-.1"><b>PNG</b><br>JPG<br>WebP<br>PDF &#8594;</div>
+
+  <h1 class="hl" id="h-mark" data-in="mark+.15" data-out="private-.15" style="top:200px;font-size:104px"><span class="ln">Mark it up.</span></h1>
+  <p class="sub" data-in="mark+.6" data-out="private-.15" style="top:316px;font-size:34px">Every tool free. <b>No watermark.</b></p>
+  <div class="toast" data-in="mark+4.9" data-out="private-.1"><svg viewBox="0 0 20 20"><path d="m5 10.5 3 3 7-7"/></svg>Copied to the clipboard</div>
+
+  <!-- 5. private -->
+  <h1 class="hl" id="h-priv" data-in="private+.1" data-out="endc-.05"><span class="ln">Nothing is</span><span class="ln"><span class="or">uploaded.</span></span></h1>
+  <ul class="nope">
+    <li data-in="private+.7" data-out="endc-.05" data-s="private+1.25">No server</li>
+    <li data-in="private+.85" data-out="endc-.05" data-s="private+1.45">No account</li>
+    <li data-in="private+1.0" data-out="endc-.05" data-s="private+1.65">No cloud gallery</li>
+    <li data-in="private+1.15" data-out="endc-.05" data-s="private+1.85">No share link</li>
+  </ul>
+  <p class="yours fx-in" data-in="private+2.1" data-out="endc-.05">Your clipboard. <b>Your disk.</b></p>
+
+  <!-- 6. end -->
+  <svg class="flood" viewBox="0 0 1080 1920" aria-hidden="true">
+    <rect class="fill" data-in="endc+.45" width="1080" height="1920" fill="#ff5a1f"/>
+    <path class="draw" data-in="endc" style="animation-duration:.9s" pathLength="1" fill="none" stroke="#ff5a1f" stroke-width="1500" stroke-linecap="round"
+      d="M-200 -300 C -150 1100, 300 1700, 1300 2250"/>
+  </svg>
+  <div class="endc">
+    <div class="tile" data-in="endc+.55"><svg viewBox="0 0 32 32"><g fill="none" stroke="#ff5a1f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="draw" data-in="endc+.8" pathLength="1" d="M9.5 8.5c0 8.5 4.5 13.5 13 13.5"/><path class="draw" data-in="endc+1.15" style="animation-duration:.3s" pathLength="1" d="m18.5 17.75 4.25 4.25-4.25 4.25"/></g></svg></div>
+    <div class="word" id="word" data-in="endc+.8">Swoop</div>
+    <p class="tagl fx-in" data-in="endc+1.25">Full-page screenshots for Chrome.</p>
+    <div class="pill" data-in="url-.2"><span id="url"></span><span class="caret"></span></div>
+    <p class="facts fx-in" data-in="url+1.2">Free · Open source · Also on Windows</p>
+  </div>
+
+  <div class="vignette"></div>
+  <div class="grain"></div>
+</div>
+<div class="r-ui"><span id="clock">0.0s</span><button type="button" id="replay">Replay</button></div>
+
+<!-- the demo page, inserted into the browser window and into the tall image -->
+<template id="page">
+  <div class="pg">
+    <header class="pg-head"><div class="pg-logo"><i></i></div><span class="pg-brand">Aster &amp; Co.</span>
+      <nav class="pg-nav"><span>Shop</span><span>Journal</span><span>Visit</span></nav><span class="pg-cart">Basket · 2</span></header>
+    <!-- screen 1 -->
+    <section class="pg-sec" style="top:128px">
+      <div class="pg-img" style="height:500px;background:linear-gradient(160deg,#f3c9a8,#e9a184 70%,#d9876a)">
+        <div class="sun" style="left:560px;top:70px;width:170px;height:170px;background:#fbe3c9"></div>
+        <div class="vase" style="left:140px;width:190px;height:300px;background:#f7efe4"></div>
+        <div class="vase" style="left:350px;width:140px;height:220px;background:#7d4b3b"></div>
+        <div class="vase" style="left:510px;width:230px;height:170px;border-radius:40% 40% 16% 16%/50% 50% 12% 12%;background:#c8d6c0"></div>
+      </div>
+      <h2 class="pg-h" style="margin-top:44px">Handmade for<br>slow mornings.</h2>
+      <p class="pg-p" style="margin-top:20px">Stoneware cups, bowls and pour-over sets, thrown by hand in our studio by the sea.</p>
+      <div style="margin-top:30px;display:flex;gap:14px"><span class="pg-btn">Shop the collection</span></div>
+    </section>
+    <!-- screen 2 -->
+    <section class="pg-sec" style="top:1060px">
+      <h3 class="pg-h2">New this season</h3>
+      <div class="grid" style="margin-top:30px">
+        <div class="prod"><div class="pg-img" style="background:#ffd6a5"><div class="vase" style="left:130px;width:150px;height:190px;background:#fff6ea"></div></div><p>Morning cup</p><span>£18.00</span></div>
+        <div class="prod"><div class="pg-img" style="background:#cddcf7"><div class="vase" style="left:110px;width:200px;height:120px;border-radius:12% 12% 50% 50%/12% 12% 60% 60%;background:#5a6f9c"></div></div><p>Deep bowl</p><span>£24.00</span></div>
+        <div class="prod"><div class="pg-img" style="background:#cfe3c8"><div class="vase" style="left:150px;width:110px;height:230px;background:#f5f1e8"></div></div><p>Bud vase</p><span>£16.00</span></div>
+        <div class="prod"><div class="pg-img" style="background:#efe3cf"><div class="vase" style="left:100px;width:220px;height:150px;background:#7d4b3b"></div></div><p>Pour-over set</p><span>£34.00</span></div>
+      </div>
+    </section>
+    <!-- screen 3 -->
+    <section class="pg-sec" style="top:2050px">
+      <div class="pg-img" style="height:470px;background:linear-gradient(200deg,#cfe3c8,#a9c4a0)">
+        <div class="sun" style="left:90px;top:80px;width:120px;height:120px;background:#eef5ea"></div>
+        <div class="vase" style="left:420px;width:260px;height:330px;background:#5d7a58"></div>
+        <div class="vase" style="left:700px;width:120px;height:180px;background:#f3eee4"></div>
+      </div>
+      <p style="margin-top:36px;font:500 20px var(--font-mono);color:#c2410c;letter-spacing:.06em">JOURNAL</p>
+      <h3 class="pg-h2" style="margin-top:10px">Inside the studio</h3>
+      <p class="pg-p" style="margin-top:16px">Every piece is wedged, thrown, trimmed and glazed by the same two pairs of hands. A cup takes eleven days from clay to kiln to your table.</p>
+      <p class="pg-p" style="margin-top:16px;color:#141210;font-weight:560">Read the story →</p>
+    </section>
+    <!-- screen 4 -->
+    <section class="pg-sec" style="top:3050px">
+      <h3 class="pg-h2">Loved at breakfast</h3>
+      <p class="pg-p" style="margin-top:8px"><span class="stars">★★★★★</span>&nbsp; 4.9 from 1,240 reviews</p>
+      <div style="display:flex;flex-direction:column;gap:18px;margin-top:30px">
+        <div class="pg-card rv"><span class="stars">★★★★★</span><p>“The cup keeps my coffee warm far longer than I expected. Beautiful glaze.”</p><span>Priya, Leeds</span></div>
+        <div class="pg-card rv"><span class="stars">★★★★★</span><p>“Arrived wrapped like a gift. The bud vase lives on my desk now.”</p><span>Tom, Bristol</span></div>
+        <div class="pg-card rv"><span class="stars">★★★★☆</span><p>“Lovely bowls, a little heavier than they look. Worth it.”</p><span>Ana, Glasgow</span></div>
+      </div>
+    </section>
+    <!-- screen 5: basket -->
+    <section class="pg-sec" style="top:4040px">
+      <h3 class="pg-h2">Your basket</h3>
+      <div style="display:flex;gap:18px;margin-top:26px">
+        <div class="pg-card" style="flex:1.25">
+          <div class="row"><span class="thumb" style="background:#ffd6a5"></span><b>Morning cup<small>Sand glaze · 2</small></b><em>£36.00</em></div>
+          <div class="row"><span class="thumb" style="background:#cddcf7"></span><b>Deep bowl<small>Ink blue · 1</small></b><em>£24.00</em></div>
+        </div>
+        <div class="pg-card" style="flex:1;padding:24px 26px">
+          <b style="font-size:24px;font-weight:600">Delivering to</b>
+          <p style="font-size:21px;line-height:1.5;color:#4b4844;margin-top:10px">Sam Rivera<br>14 Harbour Row<br>sam.r@mail.example</p>
+        </div>
+      </div>
+      <div class="row" style="padding:22px 28px 0"><b style="font-weight:500;color:#076a3d">Free delivery</b><em style="color:#076a3d">£0.00</em></div>
+      <div class="pg-card row" style="margin-top:26px;padding:26px 28px"><b style="font-size:30px;font-weight:620">Total</b><em style="font-size:32px;font-weight:640">£60.00</em></div>
+      <div style="margin-top:44px;display:flex;justify-content:flex-end"><span class="pg-btn" style="height:76px;padding:0 44px;font-size:26px">Pay £60.00</span></div>
+    </section>
+    <div class="pg-cookie"><span>We use one cookie to keep your basket.</span><span class="ok">OK</span></div>
+  </div>
+</template>
+
+<script>
+var SIZE = { w: 1080, h: 1920 };
+var CUES = {
+  open: 0,
+  flash: 1.0,
+  click: 2.5,
+  scan: 3.0,
+  stitch: 6.5,
+  mark: 10.0,
+  private: 15.5,
+  endc: 18.7,
+  url: 20.1,
+  end: 23
+};
+</script>
+<script>
+/* ENGINE helpers (keep). */
+window.R = (function(){
+  var C = CUES, render = new URLSearchParams(location.search).has('render'), beats = [], measures = [];
+  function at(expr){
+    if (typeof expr === 'number') return expr;
+    var m = String(expr).trim().match(/^([a-zA-Z_][a-zA-Z0-9_]*|[\d.]+)([+-][.\d]+)?$/);
+    if (!m) throw new Error('bad cue expression: ' + expr);
+    var base = isNaN(+m[1]) ? C[m[1]] : +m[1];
+    if (base === undefined) throw new Error('unknown cue: ' + m[1]);
+    return base + (m[2] ? +m[2] : 0);
+  }
+  function split(el, by){
+    var out = [];
+    (function walk(node){
+      Array.prototype.slice.call(node.childNodes).forEach(function(n){
+        if (n.nodeType === 1){ walk(n); return }
+        if (n.nodeType !== 3) return;
+        var frag = document.createDocumentFragment();
+        (by === 'words' ? n.textContent.split(/(\s+)/) : Array.from(n.textContent)).forEach(function(part){
+          if (part === '') return;
+          if (/^\s+$/.test(part)){ frag.appendChild(document.createTextNode(part)); return }
+          var s = document.createElement('span'); s.className = by === 'words' ? 'w' : 'c'; s.textContent = part;
+          s.style.setProperty('--i', out.length); frag.appendChild(s); out.push(s);
+        });
+        node.replaceChild(frag, n);
+      });
+    })(el);
+    el.style.setProperty('--n', out.length);
+    return out;
+  }
+  function box(el){
+    var reel = document.getElementById('reel'), r = el.getBoundingClientRect(), Rr = reel.getBoundingClientRect(), s = Rr.width / SIZE.w;
+    return { x: (r.left - Rr.left) / s, y: (r.top - Rr.top) / s, w: r.width / s, h: r.height / s,
+             cx: (r.left - Rr.left + r.width / 2) / s, cy: (r.top - Rr.top + r.height / 2) / s };
+  }
+  function type(el, text, t0, cps){
+    cps = cps || 30; t0 = at(t0);
+    for (var i = 1; i <= text.length; i++) (function(i){ beats.push([t0 + i / cps, function(){ el.textContent = text.slice(0, i) }]) })(i);
+  }
+  return { C: C, W: SIZE.w, H: SIZE.h, render: render, at: at, split: split, box: box, type: type,
+           beat: function(t, fn){ beats.push([at(t), fn]) },
+           onMeasure: function(fn){ measures.push(fn) },
+           _beats: beats, _measures: measures };
+})();
+</script>
+<script>
+/* THIS REEL */
+(function(){
+  var $ = function(id){ return document.getElementById(id) }, C = CUES, END = C.end;
+  var tpl = $('page').content;
+
+  /* the page goes into the window and into the tall image; the window also gets a fixed copy of the
+     header (sticky) and of the cookie bar (fixed to the bottom), as on the real page */
+  $('slot-win').appendChild(tpl.cloneNode(true));
+  $('slot-tall').appendChild(tpl.cloneNode(true));
+  $('sticky').appendChild(tpl.querySelector('.pg-head').cloneNode(true));
+  $('cookiefix').appendChild(tpl.querySelector('.pg-cookie').cloneNode(true));
+  $('cookiefix').firstChild.style.position = 'relative';
+
+  /* headline words */
+  document.querySelectorAll('.hl .ln').forEach(function(l){ R.split(l, 'words') });
+  R.split($('word'), 'chars');
+
+  /* keyframe tracks: absolute times (cue expressions) turned into one animation the length of the reel */
+  var st = document.createElement('style'); document.head.appendChild(st);
+  function track(el, frames){
+    var name = 'k' + Math.random().toString(36).slice(2, 8);
+    var fr = frames.map(function(f){ return [R.at(f[0]), f[1], f[2]] }).sort(function(a, b){ return a[0] - b[0] });
+    var body = '0%{' + fr[0][1] + '}';
+    fr.forEach(function(f){ body += (f[0] / END * 100).toFixed(4) + '%{' + f[1] + (f[2] ? ';animation-timing-function:' + f[2] : '') + '}' });
+    body += '100%{' + fr[fr.length - 1][1] + '}';
+    st.textContent += '@keyframes ' + name + '{' + body + '}\n';
+    var prev = el.style.animation;
+    el.style.animation = (prev ? prev + ',' : '') + name + ' ' + END + 's linear 0s both';
+  }
+  var E = 'cubic-bezier(.16,1,.3,1)', EIO = 'cubic-bezier(.65,0,.35,1)', SNAP = 'cubic-bezier(.7,0,.2,1)';
+
+  /* window: rises in, then gives way to the tall image */
+  track($('win'), [
+    ['open', 'opacity:0;transform:translateY(80px) scale(.94)', E],
+    ['open+1.1', 'opacity:1;transform:none'],
+    ['stitch', 'opacity:1;transform:none', EIO],
+    ['stitch+.01', 'opacity:0;transform:none'] ]);
+  track($('flash'), [ ['flash', 'opacity:0'], ['flash+.04', 'opacity:.95', 'ease-out'], ['flash+.5', 'opacity:0'] ]);
+  track($('shotframe'), [ ['flash+.05', 'opacity:0'], ['flash+.2', 'opacity:1'], ['click-.15', 'opacity:1'], ['click+.1', 'opacity:0'] ]);
+
+  /* scanning: five screens, the page jumps one screen at a time */
+  var STEP = .68, SCAN = .5, pageFrames = [['scan', 'transform:translateY(0)']], scanFrames = [['scan-.01', 'opacity:0;transform:translateY(88px)']];
+  for (var i = 0; i < 5; i++){
+    var t = C.scan + i * STEP;
+    scanFrames.push([t, 'opacity:1;transform:translateY(88px)', 'cubic-bezier(.45,0,.55,1)']);
+    scanFrames.push([t + SCAN, 'opacity:1;transform:translateY(994px)']);
+    scanFrames.push([t + SCAN + .02, 'opacity:0;transform:translateY(994px)']);
+    if (i < 4){
+      pageFrames.push([t + SCAN + .02, 'transform:translateY(' + (-1000 * i) + 'px)', SNAP]);
+      pageFrames.push([t + STEP - .02, 'transform:translateY(' + (-1000 * (i + 1)) + 'px)']);
+    }
+    (function(n, tt){ R.beat(tt, function(){ $('count-t').textContent = 'Capturing ' + n + ' / 5' }) })(i + 1, t);
+  }
+  R.beat(C.scan + 4 * STEP + SCAN + .05, function(){ $('count-t').textContent = 'Joined · 1 image' });
+  track($('slot-win').firstElementChild, pageFrames);
+  track($('scan'), scanFrames);
+
+  /* the tall image: takes over from the window, pulls back to show the whole page, then pushes into the basket */
+  var S = .218, TX = Math.round((1080 - 940 * S) / 2), TY = 492;
+  var start = 'opacity:1;transform:translate(70px,-3506px) scale(1);clip-path:inset(4000px 0px 0px 0px round 0px 0px 20px 20px)';
+  var editPos = 'opacity:1;transform:translate(70px,-3506px) scale(1);clip-path:inset(4000px 0px 120px 0px round 0px 0px 0px 0px)';
+  var wide = 'transform:translate(' + TX + 'px,' + TY + 'px) scale(' + S + ');clip-path:inset(0px 0px 0px 0px round 70px 70px 70px 70px)';
+  var wide2 = 'transform:translate(' + (TX - 5) + 'px,' + (TY - 12) + 'px) scale(' + (S * 1.012) + ');clip-path:inset(0px 0px 0px 0px round 70px 70px 70px 70px)';
+  /* Camera moves on the tall image are sampled, so the crop always follows the zoom: the page only shows inside
+     a screen-space window (the browser viewport, the whole frame, the editor stage) that eases with the camera. */
+  function bez(x1, y1, x2, y2){
+    return function(x){
+      var t = x;
+      for (var i = 0; i < 8; i++){
+        var cx = 3 * x1 * t * (1 - t) * (1 - t) + 3 * x2 * t * t * (1 - t) + t * t * t - x;
+        var d = 3 * x1 * (1 - t) * (1 - 3 * t) + 3 * x2 * t * (2 - 3 * t) + 3 * t * t;
+        if (Math.abs(d) < 1e-6) break; t = Math.min(1, Math.max(0, t - cx / d));
+      }
+      return 3 * y1 * t * (1 - t) * (1 - t) + 3 * y2 * t * t * (1 - t) + t * t * t;
+    };
+  }
+  var cam = function(c){ return 'transform:translate(' + c.x.toFixed(2) + 'px,' + c.y.toFixed(2) + 'px) scale(' + c.s.toFixed(5) + ')' };
+  var cropAt = function(c, wt, wb, r){
+    var top = Math.max(0, (wt - c.y) / c.s), bot = Math.max(0, 5000 - (wb - c.y) / c.s);
+    return 'clip-path:inset(' + top.toFixed(1) + 'px 0px ' + bot.toFixed(1) + 'px 0px round ' + r.toFixed(1) + 'px)';
+  };
+  var camF = [], clipF = [];
+  function move(t0, t1, c0, c1, w0, w1, r0, r1, ease, n){
+    t0 = R.at(t0); t1 = R.at(t1);
+    for (var i = 0; i <= n; i++){
+      var k = ease(i / n), c = { x: c0.x + (c1.x - c0.x) * k, y: c0.y + (c1.y - c0.y) * k, s: c0.s + (c1.s - c0.s) * k };
+      var t = t0 + (t1 - t0) * i / n;
+      camF.push([t, 'opacity:1;' + cam(c)]);
+      var kw = Math.min(1, k * 1.5);   // the crop window settles before the camera does
+      clipF.push([t, cropAt(c, w0[0] + (w1[0] - w0[0]) * kw, w0[1] + (w1[1] - w0[1]) * kw, r0 + (r1 - r0) * k)]);
+    }
+  }
+  var IN_PAGE = { x: 70, y: -3506, s: 1 }, WIDE = { x: TX, y: TY, s: S }, WIDE2 = { x: TX - 5, y: TY - 12, s: S * 1.012 };
+  var VIEW = [494, 1494], FRAME = [486, 1600], STAGE = [494, 1374], swing = bez(.7, 0, .15, 1);
+  camF.push(['stitch-.01', 'opacity:0;' + cam(IN_PAGE)]); clipF.push(['stitch-.01', cropAt(IN_PAGE, VIEW[0], VIEW[1], 20)]);
+  move('stitch+.25', 'stitch+1.75', IN_PAGE, WIDE, VIEW, FRAME, 20, 70, swing, 30);
+  move('stitch+1.8', 'mark-.05', WIDE, WIDE2, FRAME, FRAME, 70, 70, function(k){ return k }, 1);
+  move('mark-.05', 'mark+.95', WIDE2, IN_PAGE, FRAME, STAGE, 70, 0, swing, 30);
+  camF.push(['private-.1', 'opacity:1;' + cam(IN_PAGE), EIO]);
+  camF.push(['private+.45', 'opacity:0;' + cam({ x: 70, y: -3426, s: 1 })]);
+  track($('tallw'), camF);
+  track($('tall'), clipF);
+  /* seams flash where the screens were joined */
+  document.querySelectorAll('.seam').forEach(function(s){
+    var t = C.stitch + 1.0 + (+s.dataset.sn) * .12;
+    track(s, [ [t - .01, 'opacity:0;transform:scaleX(.2)'], [t + .12, 'opacity:1;transform:scaleX(1)', 'ease-out'], [t + 1.0, 'opacity:1;transform:scaleX(1)', EIO], [t + 1.5, 'opacity:0;transform:scaleX(1)'] ]);
+  });
+  /* the editor frame fades in behind the push-in */
+  track($('ed'), [ ['mark+.5', 'opacity:0;transform:scale(.985)', E], ['mark+1.05', 'opacity:1;transform:none'], ['private-.1', 'opacity:1;transform:none', EIO], ['private+.45', 'opacity:0;transform:translateY(80px)'] ]);
+
+  /* cursor to the Swoop button, click */
+  R.onMeasure(function(){
+    var b = R.box($('ext'));
+    var x1 = b.cx - 6, y1 = b.cy - 6;
+    track($('cursor'), [
+      ['open', 'opacity:0;transform:translate(640px,1250px)'],
+      ['flash+.6', 'opacity:0;transform:translate(640px,1250px)'],
+      ['flash+.8', 'opacity:1;transform:translate(640px,1250px)', 'cubic-bezier(.5,0,.15,1)'],
+      ['click-.12', 'opacity:1;transform:translate(' + x1 + 'px,' + y1 + 'px) scale(1)', 'ease-in'],
+      ['click', 'opacity:1;transform:translate(' + x1 + 'px,' + y1 + 'px) scale(.82)', 'ease-out'],
+      ['click+.12', 'opacity:1;transform:translate(' + x1 + 'px,' + y1 + 'px) scale(1)'],
+      ['click+.45', 'opacity:0;transform:translate(' + (x1 + 30) + 'px,' + (y1 + 40) + 'px)'] ]);
+    var rp = $('ripple'); rp.style.left = b.cx + 'px'; rp.style.top = b.cy + 'px';
+    track(rp, [ ['click-.01', 'opacity:0;transform:scale(.3)'], ['click', 'opacity:1;transform:scale(.3)', 'ease-out'], ['click+.6', 'opacity:0;transform:scale(1.6)'] ]);
+    track($('ext'), [ ['click-.01', 'box-shadow:0 0 0 0 rgba(255,90,31,0)'], ['click', 'box-shadow:0 0 0 4px rgba(255,90,31,1)'], ['stitch', 'box-shadow:0 0 0 4px rgba(255,90,31,1)'] ]);
+
+    /* the swoop: from the button, down the right side of the window, curling in under it */
+    var cv = $('curve'), sx = b.cx, sy = b.cy + 34;
+    cv.setAttribute('d', 'M' + sx + ' ' + sy + ' C ' + (sx + 10) + ' ' + (sy + 700) + ', ' + (sx - 40) + ' ' + (sy + 1010) + ', 540 1530');
+    track(cv.parentNode, [ ['click+.6', 'opacity:1'], ['scan+.6', 'opacity:0'] ]);
+
+    /* tall-image labels sit beside the pulled-back page */
+    var right = TX + 940 * S + 26;
+    $('tag1').style.left = right + 'px'; $('tag1').style.top = (TY + 2500 * S - 30) + 'px';
+    $('tag2').style.left = right + 'px'; $('tag2').style.top = (TY + 2500 * S + 26) + 'px';
+    var f = $('fmt'); f.style.right = (1080 - TX + 26) + 'px'; f.style.top = (TY + 3700 * S) + 'px';
+  });
+
+  /* editor toolbar: the editor's own icons */
+  var IC = {
+    select: '<path d="M5.5 3.5 15 9.2l-4.3 1.2-2.1 4.1z"/><path d="m10.7 10.4 3.8 4.6"/>',
+    crop: '<path d="M6 2.75V14h11.25M2.75 6H14v11.25"/>',
+    rect: '<rect x="3.25" y="4.75" width="13.5" height="10.5" rx="1.75"/>',
+    ellipse: '<ellipse cx="10" cy="10" rx="6.75" ry="5.25"/>',
+    arrow: '<path d="M4.5 15.5 15 5M8.25 4.75H15.25V11.75"/>',
+    pen: '<path d="m3.75 16.25.9-3.6 8.6-8.6a1.5 1.5 0 0 1 2.1 0l.6.6a1.5 1.5 0 0 1 0 2.1l-8.6 8.6z"/><path d="m11.75 5.5 2.75 2.75"/>',
+    marker: '<path d="m7.25 14.75-2-2 7.9-7.9a1.4 1.4 0 0 1 2 0l0 0a1.4 1.4 0 0 1 0 2z"/><path d="M5.25 12.75 3.5 16.5h3.75l0-1.75M10.5 16.5h6"/>',
+    text: '<path d="M4.5 5.75v-2h11v2M10 3.75v12.5M7.5 16.25h5"/>',
+    step: '<circle cx="10" cy="10" r="6.75"/><path d="M8.75 8 10.5 7v6"/>',
+    blur: '<path d="M3.5 3.5h4v4h-4zM12.5 3.5h4v4h-4zM8 8h4v4H8zM3.5 12.5h4v4h-4zM12.5 12.5h4v4h-4z"/>',
+    copy: '<rect x="7" y="7" width="9.25" height="9.25" rx="2"/><path d="M13 4.75v-.5a1.5 1.5 0 0 0-1.5-1.5h-6.75a1.5 1.5 0 0 0-1.5 1.5V11a1.5 1.5 0 0 0 1.5 1.5h.5"/>',
+    save: '<path d="M10 3.5v9M6.25 9 10 12.75 13.75 9M4 16.25h12"/>'
+  };
+  var ico = function(n){ return '<svg class="se-ico" viewBox="0 0 20 20">' + IC[n] + '</svg>' };
+  var bar = '';
+  ['select', 'crop', 'rect', 'ellipse', 'arrow', 'pen', 'marker', 'text', 'step', 'blur'].forEach(function(n){
+    bar += '<span class="se-btn" data-tool="' + n + '"' + (n === 'select' ? ' aria-pressed="true"' : '') + '>' + ico(n) + '</span>';
+  });
+  bar += '<span class="sep"></span>';
+  ['#ff3b30', '#ffd60a', '#0a84ff', '#16161a'].forEach(function(c, i){ bar += '<span class="sw' + (i ? '' : ' on') + '" style="background:' + c + '"></span>' });
+  bar += '<span class="grow"></span><span class="se-btn" data-tool="copy">' + ico('copy') + 'Copy</span><span class="se-btn save">' + ico('save') + 'Save</span>';
+  $('edbar').innerHTML = bar;
+  function tool(n){ document.querySelectorAll('#edbar [data-tool]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.tool === n ? 'true' : 'false') }) }
+  function swatch(i){ document.querySelectorAll('#edbar .sw').forEach(function(s, k){ s.classList.toggle('on', k === i) }) }
+  R.beat('open', function(){ tool('select'); swatch(0) });
+  R.beat('mark+1.05', function(){ tool('rect') });
+  R.beat('mark+1.7', function(){ tool('step') });
+  R.beat('mark+2.25', function(){ tool('arrow') });
+  R.beat('mark+2.95', function(){ tool('step') });
+  R.beat('mark+3.45', function(){ tool('blur') });
+  R.beat('mark+4.1', function(){ tool('marker'); swatch(1) });
+  R.beat('mark+4.75', function(){ tool('copy') });
+
+  /* blur: the editor pixelates, so draw a mosaic of the address block */
+  (function(){
+    var m = $('mosaic'), w = 330, h = 150, cell = 15, cv = document.createElement('canvas'), x = cv.getContext('2d');
+    cv.width = w; cv.height = h; x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
+    var rows = [[8, 40, 160], [44, 76, 220], [80, 112, 300]], seed = 7;
+    function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280 }
+    for (var yy = 0; yy < h; yy += cell) for (var xx = 0; xx < w; xx += cell){
+      var ink = 0;
+      rows.forEach(function(r){ if (yy + cell > r[0] && yy < r[1] && xx < r[2]) ink = .25 + rnd() * .55 });
+      var g = Math.round(255 - ink * 150);
+      x.fillStyle = 'rgb(' + g + ',' + g + ',' + (g - 3) + ')'; x.fillRect(xx, yy, cell, cell);
+    }
+    m.style.background = 'url(' + cv.toDataURL() + ') 0 0 / 100% 100%';
+  })();
+
+  /* end card: the URL types itself */
+  R.type($('url'), 'mhfrough.github.io/swoop', 'url', 26);
+
+})();
+</script>
+<script>
+/* ENGINE boot (keep) */
+(function(){
+  var C = CUES, $ = function(id){ return document.getElementById(id) };
+  var reel = $('reel'), render = R.render, root = document.documentElement.style;
+  if (render) document.documentElement.classList.add('render');
+  root.setProperty('--W', SIZE.w); root.setProperty('--H', SIZE.h);
+  for (var k in C) root.setProperty('--' + k, C[k].toFixed(3) + 's');
+  document.querySelectorAll('[data-in]').forEach(function(el){
+    el.style.setProperty('--d', R.at(el.dataset.in).toFixed(3) + 's');
+    el.style.setProperty('--o', R.at(el.dataset.out || 'end+1').toFixed(3) + 's');
+  });
+  document.querySelectorAll('[data-s]').forEach(function(el){ el.style.setProperty('--s', R.at(el.dataset.s).toFixed(3) + 's') });
+  document.querySelectorAll('[data-at]').forEach(function(el){ el.style.setProperty('--at', R.at(el.dataset.at).toFixed(3) + 's') });
+  function fit(){
+    if (render) return;
+    var s = Math.min(innerWidth / SIZE.w, innerHeight / SIZE.h);
+    reel.style.transform = 'translate(' + ((innerWidth - SIZE.w * s) / 2) + 'px,' + ((innerHeight - SIZE.h * s) / 2) + 'px) scale(' + s + ')';
+  }
+  fit(); addEventListener('resize', fit);
+  function measure(){
+    var keep = reel.style.transform; reel.style.transform = 'none';
+    reel.classList.add('measure');
+    document.querySelectorAll('.r-fit').forEach(function(h){
+      var room = Math.min(h.parentNode.clientWidth || SIZE.w, SIZE.w - 96), widest = 0;
+      var lines = Array.prototype.filter.call(h.children, function(c){
+        return c.tagName === 'SPAN' && !c.classList.contains('c') && !c.classList.contains('w') });
+      if (!lines.length) lines = [h];
+      lines.forEach(function(s){ widest = Math.max(widest, s.scrollWidth) });
+      if (widest > room) h.style.fontSize = (parseFloat(getComputedStyle(h).fontSize) * room / widest * .98).toFixed(1) + 'px';
+    });
+    R._measures.forEach(function(fn){ fn() });
+    reel.classList.remove('measure');
+    reel.style.transform = keep;
+  }
+  var fonts = []; document.fonts.forEach(function(f){ fonts.push(f.load().catch(function(){})) });
+  window.reelReady = Promise.all(fonts).then(function(){ return document.fonts.ready }).then(function(){
+    measure();
+    window.REEL = { cues: C, duration: C.end, width: SIZE.w, height: SIZE.h };
+  });
+  window.startReel = function(){
+    document.body.classList.remove('hold');
+    var BEATS = R._beats;
+    if (render){ BEATS.forEach(function(b){ setTimeout(b[1], b[0] * 1000) }); return }
+    var ref = $('clk').getAnimations()[0], left = BEATS.slice().sort(function(x, y){ return x[0] - y[0] });
+    (function tick(){
+      var t = (ref.currentTime || 0) / 1000;
+      while (left.length && left[0][0] <= t) left.shift()[1]();
+      $('clock').textContent = Math.min(t, C.end).toFixed(1) + 's';
+      if (t < C.end) requestAnimationFrame(tick);
+    })();
+  };
+  $('replay').onclick = function(){ location.reload() };
+  if (!render) window.reelReady.then(window.startReel);
+})();
+</script>
+</body>
+</html>

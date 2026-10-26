@@ -1,0 +1,186 @@
+{
+  "name": "swoop-chrome-reel",
+  "root": "..",
+  "page": "promo/swoop-chrome-reel.html",
+  "port": 8176,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "scale": 2,
+  "crf": 16,
+  "work": "promo/.reel-work",
+  "out": "videos/swoop-chrome-reel.mp4",
+  "poster_t": 9.2,
+  "music": {
+    "file": "promo/swoop-chrome-bgm.mp3",
+    "offset": 5.45,
+    "gain_db": -14,
+    "fade_out": 1.2
+  },
+  "voiceover": {
+    "file": "promo/swoop-chrome-voiceover.wav",
+    "offset": 0.0,
+    "mute": "",
+    "duck_db": -9
+  },
+  "sfx": [
+    {
+      "file": "promo/sfx/chrome/tape.wav",
+      "at": "flash",
+      "gain_db": -20,
+      "len": 0.4
+    },
+    {
+      "file": "promo/sfx/chrome/click.wav",
+      "at": "click",
+      "gain_db": -10
+    },
+    {
+      "file": "promo/sfx/chrome/whoosh.wav",
+      "at": "click-.2",
+      "gain_db": -18,
+      "pan": 0.3
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "scan+0.00",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "scan+0.68",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "scan+1.36",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "scan+2.04",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "scan+2.72",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/riser.wav",
+      "at": "stitch-2.45",
+      "gain_db": -20
+    },
+    {
+      "file": "promo/sfx/chrome/impact.wav",
+      "at": "stitch+.25",
+      "gain_db": -12
+    },
+    {
+      "file": "promo/sfx/chrome/whoosh.wav",
+      "at": "mark-.6",
+      "gain_db": -16
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+1.25",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+1.8",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+2.35",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+3.05",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+3.55",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "mark+4.25",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/click.wav",
+      "at": "mark+4.75",
+      "gain_db": -14
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "private+1.25",
+      "gain_db": -15
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "private+1.45",
+      "gain_db": -15
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "private+1.65",
+      "gain_db": -15
+    },
+    {
+      "file": "promo/sfx/chrome/tick.wav",
+      "at": "private+1.85",
+      "gain_db": -15
+    },
+    {
+      "file": "promo/sfx/chrome/subdrop.wav",
+      "at": "private",
+      "gain_db": -16
+    },
+    {
+      "file": "promo/sfx/chrome/boom.wav",
+      "at": "endc",
+      "gain_db": -9
+    },
+    {
+      "file": "promo/sfx/chrome/shimmer.wav",
+      "at": "endc+.55",
+      "gain_db": -20
+    },
+    {
+      "file": "promo/sfx/chrome/type-url.wav",
+      "at": "url",
+      "gain_db": -20
+    }
+  ],
+  "sfx_duck_db": -4,
+  "direction": {
+    "concept": "cold-open-demo",
+    "aspect": "9:16",
+    "length": 23,
+    "tone": "dark",
+    "palette": [
+      "#09090b",
+      "#f4f3f1",
+      "#ff5a1f",
+      "#ff3b30"
+    ],
+    "display_font": "Geist",
+    "type": "grotesk",
+    "motion": "cinematic",
+    "camera": "scroll",
+    "composition": "centered",
+    "demo": "device-frame",
+    "opening": "cold-open-ui",
+    "ending": "url-type",
+    "texture": "grain",
+    "signature": "the page scans screen by screen, then the camera pulls back to one tall image and pushes into the editor",
+    "music": "cinematic",
+    "bpm": 100,
+    "sfx": "cinematic"
+  }
+}

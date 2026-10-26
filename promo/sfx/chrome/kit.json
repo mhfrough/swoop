@@ -1,0 +1,15 @@
+{
+ "palette": "cinematic",
+ "seed": 517,
+ "lengths": {
+  "whoosh": 1.6,
+  "riser": 2.7,
+  "reverse": 2.1,
+  "boom": 3.4,
+  "impact": 2.3,
+  "subdrop": 2.1,
+  "tick": 0.04,
+  "shimmer": 2.4,
+  "tape": 1.7
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "palette": "digital",
+ "seed": 733,
+ "lengths": {
+  "swipe": 1.12,
+  "whoosh": 1.6,
+  "click": 0.05,
+  "tick": 0.04,
+  "pop": 1.04,
+  "notif": 1.35,
+  "glitch": 1.4,
+  "impact": 2.3,
+  "riser": 2.7,
+  "type": 0.817,
+  "chime": 2.5
+ }
+}
