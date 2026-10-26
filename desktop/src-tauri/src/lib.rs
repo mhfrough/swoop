@@ -149,21 +149,53 @@ fn start_capture(app: &AppHandle, delay_ms: u64) {
     });
 }
 
+/// The pointer in physical screen pixels. On Windows it is read right here, on the capture thread,
+/// rather than through the event loop, so a busy main thread can't make a capture lose it.
+#[cfg(windows)]
+fn pointer(_app: &AppHandle) -> Option<(i32, i32)> {
+    use windows_sys::Win32::{Foundation::POINT, UI::WindowsAndMessaging::GetCursorPos};
+    let mut p = POINT { x: 0, y: 0 };
+    (unsafe { GetCursorPos(&mut p) } != 0).then_some((p.x, p.y))
+}
+#[cfg(not(windows))]
+fn pointer(app: &AppHandle) -> Option<(i32, i32)> {
+    app.cursor_position().ok().map(|p| (p.x as i32, p.y as i32))
+}
+
+/// The monitor under the pointer, never the one with the active window. A pointer between screens
+/// gets the closest one; the primary one only when the pointer can't be read at all (Wayland).
+fn monitor_at(point: Option<(i32, i32)>) -> Result<xcap::Monitor, String> {
+    let all = xcap::Monitor::all().map_err(|e| e.to_string())?;
+    let index = match point {
+        Some(p) => {
+            let rects: Vec<Rect> = all
+                .iter()
+                .map(|m| (m.x().unwrap_or(0), m.y().unwrap_or(0), m.width().unwrap_or(0), m.height().unwrap_or(0)))
+                .collect();
+            nearest(&rects, p)
+        }
+        None => all.iter().position(|m| m.is_primary().unwrap_or(false)).unwrap_or(0),
+    };
+    all.into_iter().nth(index).ok_or_else(|| "No screen found".into())
+}
+
+/// x, y, width, height
+type Rect = (i32, i32, u32, u32);
+
+/// The screen that contains the point, or the closest one to it.
+fn nearest(rects: &[Rect], (px, py): (i32, i32)) -> usize {
+    let gap = |&(x, y, w, h): &Rect| {
+        let (right, bottom) = (x + w as i32 - 1, y + h as i32 - 1);
+        let dx = if px < x { x - px } else if px > right { px - right } else { 0 } as i64;
+        let dy = if py < y { y - py } else if py > bottom { py - bottom } else { 0 } as i64;
+        dx * dx + dy * dy
+    };
+    (0..rects.len()).min_by_key(|&i| gap(&rects[i])).unwrap_or(0)
+}
+
 fn capture(app: &AppHandle) -> Result<(), String> {
     let err = |e: xcap::XCapError| e.to_string();
-    // the monitor under the pointer; the first one when the pointer can't be read (Wayland)
-    let monitor = app
-        .cursor_position()
-        .ok()
-        .and_then(|p| xcap::Monitor::from_point(p.x as i32, p.y as i32).ok());
-    let monitor = match monitor {
-        Some(m) => m,
-        None => {
-            let all = xcap::Monitor::all().map_err(err)?;
-            let primary = all.iter().position(|m| m.is_primary().unwrap_or(false)).unwrap_or(0);
-            all.into_iter().nth(primary).ok_or("No screen found")?
-        }
-    };
+    let monitor = monitor_at(pointer(app))?;
     let image = monitor.capture_image().map_err(err)?;
     let (x, y) = (monitor.x().map_err(err)?, monitor.y().map_err(err)?);
     let scale = monitor.scale_factor().unwrap_or(1.0).max(0.5);
@@ -748,4 +780,29 @@ pub fn run() {
                 }
             }
         });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::nearest;
+
+    // a 1920x1080 primary screen with a 2560x1080 screen above it, shifted left (physical pixels)
+    const SCREENS: [(i32, i32, u32, u32); 2] = [(0, 0, 1920, 1080), (-305, -1080, 2560, 1080)];
+
+    #[test]
+    fn picks_the_screen_under_the_pointer() {
+        assert_eq!(nearest(&SCREENS, (960, 540)), 0);
+        assert_eq!(nearest(&SCREENS, (1919, 1079)), 0);
+        assert_eq!(nearest(&SCREENS, (0, -540)), 1);
+        assert_eq!(nearest(&SCREENS, (-305, -1080)), 1);
+        assert_eq!(nearest(&SCREENS, (1700, -1)), 1);
+        assert_eq!(nearest(&SCREENS, (1700, 0)), 0);
+    }
+
+    #[test]
+    fn a_pointer_off_every_screen_gets_the_closest() {
+        assert_eq!(nearest(&SCREENS, (-200, 500)), 0);
+        assert_eq!(nearest(&SCREENS, (2400, -500)), 1);
+        assert_eq!(nearest(&[], (0, 0)), 0);
+    }
 }
